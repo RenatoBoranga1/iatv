@@ -11,7 +11,10 @@ jobs:
           POSTGRES_PASSWORD: ci-local-only
           POSTGRES_DB: iatv
         ports: ['5432:5432']
-        options: --health-cmd='pg_isready -U iatv' --health-interval=5s --health-retries=10
+        options: >-
+          --health-cmd "pg_isready -U iatv"
+          --health-interval 5s
+          --health-retries 10
     env:
       DATABASE_URL: postgresql://iatv:ci-local-only@localhost:5432/iatv
     steps:
@@ -32,6 +35,8 @@ jobs:
       - uses: actions/setup-java@v4
         with: {distribution: temurin, java-version: '21'}
       - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew && ./gradlew assembleDebug testDebugUnitTest lintDebug
         working-directory: apps/android-tv
