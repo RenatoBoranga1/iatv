@@ -4,6 +4,8 @@
 
 Central de entretenimento nativa para Android TV / Google TV. Este primeiro milestone usa catálogo fictício da própria API, assistente por regras e sinal de vídeo próprio. Sem serviços comerciais de conteúdo, pagamentos ou IA externa.
 
+![Home executando no emulador Android TV](docs/screenshots/android-tv-home.png)
+
 ## Estrutura
 ```text
 apps/android-tv  Kotlin, Compose for TV, Hilt, Retrofit e Media3

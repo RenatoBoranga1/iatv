@@ -24,4 +24,8 @@ Os avisos Android incluem versões mais novas de bibliotecas/Gradle/target SDK, 
 
 O Docker daemon não estava ativo; os containers não foram executados. Para validar o banco foi usado um PostgreSQL 18 temporário isolado em `.tools`, encerrado após o teste; o Compose está configurado para PostgreSQL 17. A equivalência do Compose completo deve ser validada no ambiente com Docker ativo.
 
-O emulador de celular disponível não completou o boot. A validação de execução em Android TV está sendo tratada separadamente do build. A cobertura automatizada ainda não inclui testes de ViewModel, navegação instrumentada ou player real em TV física.
+O emulador de celular disponível não completou o boot. Depois foi criada uma instância isolada com a imagem oficial Android TV API 34 x86, com checksum do fornecedor verificado. Nela foram confirmados: instalação e abertura do APK, Home carregada da API, detalhes abertos via Direita/OK, reprodução Media3 do sinal próprio, retorno via Back com foco restaurado no card Aurora TV e acesso ao assistente pelo D-Pad com retorno de cinco partidas fictícias.
+
+Também foi confirmada a recomendação de comédia, com o card “Domingo em Família”. A inspeção visual revelou contraste inadequado nos botões; o componente TvAction foi introduzido e o APK reinstalado para confirmar fundo escuro, foco verde e texto legível. Captura real: `docs/screenshots/android-tv-home.png`.
+
+A cobertura automatizada ainda não inclui testes de ViewModel, navegação instrumentada ou player em TV física. O teste de execução foi um smoke test assistido com ADB no emulador Android TV, sem touchscreen.
