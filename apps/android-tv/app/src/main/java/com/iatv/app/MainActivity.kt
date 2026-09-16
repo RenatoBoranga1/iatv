@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.tv.material3.Button as TvButton
+import com.iatv.app.core.ui.TvAction as TvButton
 import com.iatv.app.core.model.ContentCard
 import com.iatv.app.core.model.EpgProgram
 import com.iatv.app.core.player.PlaybackScreen

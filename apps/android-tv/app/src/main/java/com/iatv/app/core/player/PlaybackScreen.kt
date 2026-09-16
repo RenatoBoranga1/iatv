@@ -15,7 +15,7 @@ import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
-import androidx.tv.material3.Button
+import com.iatv.app.core.ui.TvAction as Button
 import com.iatv.app.core.model.ContentCard
 import com.iatv.app.core.network.TvRepository
 import kotlinx.coroutines.delay
