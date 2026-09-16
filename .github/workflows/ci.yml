@@ -1,0 +1,37 @@
+name: IA TV
+on: [push, pull_request]
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: iatv
+          POSTGRES_PASSWORD: ci-local-only
+          POSTGRES_DB: iatv
+        ports: ['5432:5432']
+        options: --health-cmd='pg_isready -U iatv' --health-interval=5s --health-retries=10
+    env:
+      DATABASE_URL: postgresql://iatv:ci-local-only@localhost:5432/iatv
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '22', cache: npm}
+      - run: npm ci
+      - run: npm run db:generate
+      - run: npm run build
+      - run: npm run lint
+      - run: npm test
+      - run: npm run db:migrate && npm run db:seed
+      - run: node scripts/verify-database.cjs
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - run: chmod +x gradlew && ./gradlew assembleDebug testDebugUnitTest lintDebug
+        working-directory: apps/android-tv

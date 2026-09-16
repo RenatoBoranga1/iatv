@@ -1,0 +1,19 @@
+{
+  "name": "iatv",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/backend",
+    "packages/contracts",
+    "apps/admin"
+  ],
+  "scripts": {
+    "build": "npm run build -w @iatv/contracts && npm run build -w @iatv/backend",
+    "lint": "npm run lint -w @iatv/backend",
+    "test": "npm run test -w @iatv/backend",
+    "dev": "npm run dev -w @iatv/backend",
+    "db:generate": "npm run db:generate -w @iatv/backend",
+    "db:migrate": "npm run db:migrate -w @iatv/backend",
+    "db:seed": "npm run db:seed -w @iatv/backend"
+  }
+}

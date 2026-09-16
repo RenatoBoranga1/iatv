@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-iatv}
+      POSTGRES_DB: ${POSTGRES_DB:-iatv}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Configure POSTGRES_PASSWORD no ambiente}
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: ["postgres_data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+  backend:
+    build:
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-iatv}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-iatv}?schema=public
+      DATA_MODE: postgres
+      DEMO_MEDIA_URL: ${DEMO_MEDIA_URL:-http://10.0.2.2:3000/media/test-pattern.mp4}
+    ports: ["3000:3000"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: sh -c "npm run db:migrate && npm run db:seed && npm run start -w @iatv/backend"
+volumes:
+  postgres_data:

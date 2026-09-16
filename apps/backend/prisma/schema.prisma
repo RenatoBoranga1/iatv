@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+// Milestone 1: catálogo comum, somente metadados fictícios. Entidades de conta
+// e cobrança serão introduzidas quando seus fluxos forem implementados.
+model Content {
+  id String @id
+  kind String
+  title String
+  overview String
+  category String
+  durationMinutes Int
+  badge String
+  playable Boolean @default(false)
+  @@index([kind, category])
+}
+model FeatureFlag {
+  key String @id
+  enabled Boolean @default(false)
+}
