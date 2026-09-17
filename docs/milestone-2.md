@@ -65,7 +65,7 @@ Supertest 7.1.1 e ESLint 9.28 também emitem depreciação; cobertura e lint con
 | Android testes | PASS — 7 testes |
 | Android lint | PASS — 0 erros, 18 warnings |
 | Runtime emulador M2 | MP4, HLS VOD, DASH VOD, HLS live próprio, erro/retry, Back e diagnóstico observados |
-| GitHub Actions M2 | Backend e Android PASS no run 35215468073; correções finais terão novo run |
+| GitHub Actions M2 | Backend e Android PASS no [run final 35244772990](https://github.com/RenatoBoranga1/iatv/actions/runs/35244772990), código 7c6eb5b |
 | TV física / standby / Wi-Fi fabricante / 2h | REQUIRES_PHYSICAL_DEVICE |
 
 Avisos: versões Android mais novas, target SDK, banner, orientação TV, backup, KTX;
@@ -106,6 +106,11 @@ No APK final, HLS live chegou ao primeiro frame em 1562ms. O teste encontrou e c
 foco perdido após esconder controles: o host agora recebe setas/OK com overlay oculto,
 reabre PlayerView e devolve o foco aos controles. Reabertura confirmada visualmente;
 captura screenshots/android-tv-player-controls.png. Build, sete testes e lint repetidos após correção.
+
+APK local final: `apps/android-tv/app/build/outputs/apk/debug/app-debug.apk`, versão 0.2.0 (2).
+SHA-256: `D990F94A9C96DACCCC81BFF3C4CA3F08A8F6EB5B48C9C2E2F4F9F707DB082279`.
+Build local identifica commit como `local`; CI injeta GITHUB_SHA. Artefato debug não é
+assinatura de publicação na loja. Emulador, API e gerador live de teste encerrados após validação.
 
 Não considerar milestone aprovado por teste físico até preencher [resultados](physical-tv-test-results.md).
 Progresso/favoritos são locais, sincronização remota não existe. EPG é fictício; nenhum servidor
