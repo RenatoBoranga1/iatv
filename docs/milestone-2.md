@@ -102,6 +102,10 @@ Após sessão prolongada do gerador, segmento HLS expirado retornou 404; recuper
 janela live ficou limitada ao mesmo orçamento. O gerador passou a reter mais segmentos
 e publicar manifesto atomicamente. Também corrigida saída DASH que colocava segmentos
 na raiz em vez da pasta da mídia. Diálogos de trilhas são dispensados ao liberar o player.
+No APK final, HLS live chegou ao primeiro frame em 1562ms. O teste encontrou e corrigiu
+foco perdido após esconder controles: o host agora recebe setas/OK com overlay oculto,
+reabre PlayerView e devolve o foco aos controles. Reabertura confirmada visualmente;
+captura screenshots/android-tv-player-controls.png. Build, sete testes e lint repetidos após correção.
 
 Não considerar milestone aprovado por teste físico até preencher [resultados](physical-tv-test-results.md).
 Progresso/favoritos são locais, sincronização remota não existe. EPG é fictício; nenhum servidor

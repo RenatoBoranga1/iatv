@@ -2,12 +2,14 @@ package com.iatv.app.core.player
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.focusable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -31,6 +33,8 @@ import com.iatv.app.core.network.NetworkState
     val controller = remember(item.id) { PlaybackController(context.applicationContext, item, repository, scope) }
     val state by controller.state.collectAsStateWithLifecycle()
     var overlay by remember { mutableStateOf(true) }
+    val hostFocus = remember { FocusRequester() }
+    var playerView by remember { mutableStateOf<PlayerView?>(null) }
     var toolbarFocused by remember { mutableStateOf(false) }
     val retryFocus = remember { FocusRequester() }
     LaunchedEffect(state) { if(state is PlayerState.Error || state == PlayerState.Ended) retryFocus.requestFocus() }
@@ -61,7 +65,14 @@ import com.iatv.app.core.network.NetworkState
             }
         } catch(cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch(_: Exception) { epg = "Guia temporariamente indisponível" }
     }
-    Column(Modifier.fillMaxSize().padding(24.dp)) {
+    Column(Modifier.fillMaxSize().padding(24.dp).focusRequester(hostFocus).onPreviewKeyEvent { event ->
+        val wakeKey = event.key in listOf(Key.DirectionUp, Key.DirectionDown, Key.DirectionLeft, Key.DirectionRight, Key.DirectionCenter, Key.Enter)
+        if(event.type == KeyEventType.KeyDown && wakeKey && !overlay) {
+            overlay = true
+            playerView?.let { view -> view.showController(); view.post { view.requestFocus() } }
+            true
+        } else false
+    }.focusable()) {
         if(overlay || toolbarFocused || state is PlayerState.Error || state is PlayerState.Recovering || state == PlayerState.Ended) {
             Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) { Button(onClick = onBack) { Text("Voltar") }; Text(item.title) }
             if(epg.isNotEmpty()) Text(epg)
@@ -88,16 +99,20 @@ import com.iatv.app.core.network.NetworkState
                 }
             }
             AndroidView(factory = { PlayerView(it).apply {
+                playerView = this
                 useController = true; controllerShowTimeoutMs = 5000; isFocusable = true
                 setShowSubtitleButton(true)
-                setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility -> overlay = visibility == android.view.View.VISIBLE })
+                setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility ->
+                    overlay = visibility == android.view.View.VISIBLE
+                    if(!overlay) post { if(isAttachedToWindow && !toolbarFocused) hostFocus.requestFocus() }
+                })
                 requestFocus()
             } }, update = { view ->
                 if(view.player !== player) {
                     view.player = player
                     view.post { if(view.player === player) { view.requestFocus(); view.showController() } }
                 }
-            }, onRelease = { it.player = null; it.setControllerVisibilityListener(null as PlayerView.ControllerVisibilityListener?) }, modifier = Modifier.fillMaxWidth().weight(1f))
+            }, onRelease = { it.setControllerVisibilityListener(null as PlayerView.ControllerVisibilityListener?); it.player = null; playerView = null }, modifier = Modifier.fillMaxWidth().weight(1f))
         }
     }
 }
