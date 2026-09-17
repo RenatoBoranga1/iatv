@@ -69,6 +69,23 @@ npm run build -w @iatv/admin
 Resultados desta implementação em [docs/validation.md](docs/validation.md). O workflow CI deve ficar na raiz do repositório IA TV ao publicá-lo; neste workspace o projeto é uma subpasta.
 
 ## Estado atual
+Milestone 1 — concluído. Milestone 2 — hardening em validação; aprovação física pendente.
+
+Consulte o [baseline](docs/milestone-2-baseline.md), [relatório M2](docs/milestone-2.md),
+[matriz de foco](docs/tv-focus-test-matrix.md), [plano físico](docs/physical-tv-test-plan.md),
+[comandos ADB](docs/adb-tv-testing.md) e [arquitetura mobile futura](docs/mobile-architecture.md).
+
+Para HLS/DASH próprios, execute `scripts/generate-stream-fixtures.ps1 -Mode vod` com FFmpeg
+instalado. As saídas ficam em `apps/backend/media/generated/` (ignoradas pelo Git).
+Use `DEMO_MEDIA_URL=http://10.0.2.2:3000/media/generated/vod.m3u8` ou `vod.mpd`.
+Para live real de teste, mantenha `scripts/generate-stream-fixtures.ps1 -Mode live` executando
+em outro terminal e configure `DEMO_LIVE_URL=http://10.0.2.2:3000/media/generated/live.m3u8`.
+TV física usa IP da máquina. O sinal contém apenas padrão de teste e áudio próprios.
+Não confundir o MP4 repetido legado com streaming live.
+
+Diagnóstico: Configurações → Sobre → Diagnóstico. Builds CI incluem commit;
+localmente usar `-PIATV_GIT_COMMIT=HASH`. Os dados copiados não incluem URL ou credenciais.
+
 Home com menu e carrosséis, detalhes, catálogo fictício, agenda diária, busca, assistente mock, guia fictício e player de demonstração. Favoritos/cache/progresso locais no perfil demonstrativo. Admin apenas estrutural. Canais repetem sinal próprio, não uma transmissão ao vivo real. Séries ainda são cards demonstrativos, sem seleção de temporadas.
 
 Auth, QR, múltiplos perfis, sincronização, pagamentos e integrações reais ficam fora desta primeira entrega. Veja [arquitetura](docs/architecture.md), [guia Android](docs/android-tv.md) e [próximo milestone](docs/roadmap.md).
