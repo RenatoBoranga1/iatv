@@ -15,7 +15,7 @@ process.env.DATA_MODE = "postgres";
     const health = await request(app.getHttpServer())
       .get("/v1/health")
       .expect(200);
-    assert.equal(health.body.dataMode, "postgres");
+    assert.deepEqual(health.body, { status: "ok", database: "ok" });
     const home = await request(app.getHttpServer()).get("/v1/home").expect(200);
     assert.ok(
       home.body.sections

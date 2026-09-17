@@ -43,6 +43,13 @@ nativo não depende de CORS). Helmet, Prisma parametrizado, DTO whitelist e rate
 URLs demo exigem HTTP(S) sem credenciais; logs usam templates de rota sem query/body.
 Segredos/keystores/local.properties ignorados. Debug permite LAN HTTP; release mantém HTTPS.
 
+Auditoria npm após atualização: 8 alertas high no grafo de produção (inclui transitivas
+do CLI Prisma); 9 no grafo completo. Restam Multer 2.2.0 (sem endpoints de upload no app),
+Effect e DeepmergeTS sob Prisma config (não recebem configuração externa nesta aplicação).
+Não aplicado audit fix --force: sugere Nest 12 e downgrade Prisma. Estes riscos não são
+declarados resolvidos e exigem nova revisão antes de expor uploads/configuração remota.
+Supertest 7.1.1 e ESLint 9.28 também emitem depreciação; cobertura e lint continuam ativos.
+
 ## Validação e critérios
 
 | Verificação | Resultado |
@@ -63,6 +70,8 @@ Avisos: versões Android mais novas, target SDK, banner, orientação TV, backup
 clipboard Compose legado funciona mas possui aviso de depreciação. Não ocultados por suppressions.
 Uma rodada intermediária compilou testes enquanto fontes mudavam; outra expôs limpeza do
 dispatcher de testes antes de cancelar coroutines. Corrigido e suíte reexecutada com sucesso.
+O primeiro CI M2 encontrou verificador de banco ainda esperando dataMode no health;
+atualizado para o contrato seguro status/database. Nenhum teste desativado.
 
 Não considerar milestone aprovado por teste físico até preencher [resultados](physical-tv-test-results.md).
 Progresso/favoritos são locais, sincronização remota não existe. EPG é fictício; nenhum servidor
