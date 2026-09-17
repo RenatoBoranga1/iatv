@@ -2,6 +2,7 @@ package com.iatv.app.core.network
 import com.iatv.app.core.model.*
 import retrofit2.http.*
 interface TvApi {
+    @GET("v1/health") suspend fun health(): Map<String, String>
     @GET("v1/home") suspend fun home(): HomeResponse
     @GET("v1/catalog") suspend fun catalog(): List<ContentCard>
     @GET("v1/search") suspend fun search(@Query("q") query: String): List<ContentCard>

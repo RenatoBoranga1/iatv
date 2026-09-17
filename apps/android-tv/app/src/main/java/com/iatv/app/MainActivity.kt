@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -29,31 +31,48 @@ import com.iatv.app.core.ui.TvCard
 import com.iatv.app.feature.home.TvViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import com.iatv.app.core.diagnostics.DebugTelemetry
+import com.iatv.app.core.diagnostics.DiagnosticsScreen
+import com.iatv.app.core.network.NetworkState
 
 @AndroidEntryPoint class MainActivity: ComponentActivity() {
     private val model: TvViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DebugTelemetry.event("app_open")
         setContent { MaterialTheme(colorScheme = darkColorScheme(primary = Color(0xFF65E4C5), background = Color(0xFF0C101B))) { Surface(Modifier.fillMaxSize()) { TvApp(model) } } }
     }
 }
 private val menu = listOf("Início", "TV ao Vivo", "Filmes", "Séries", "YouTube", "Jogos do Dia", "Minha Lista", "Busca", "Perfil", "Configurações")
+private val cardSaver = Saver<ContentCard?, String>(save = { com.google.gson.Gson().toJson(it) }, restore = { com.google.gson.Gson().fromJson(it, ContentCard::class.java) })
+private val scrollSaver = mapSaver(
+    save = { states: MutableMap<String, LazyListState> -> states.mapValues { arrayListOf(it.value.firstVisibleItemIndex, it.value.firstVisibleItemScrollOffset) } },
+    restore = { values -> values.mapValues { (_, value) -> val pair = value as List<*>; LazyListState(pair[0] as Int, pair[1] as Int) }.toMutableMap() }
+)
 @Composable private fun TvApp(model: TvViewModel) {
     var page by rememberSaveable { mutableStateOf("Início") }
     var query by rememberSaveable { mutableStateOf("") }
     var date by rememberSaveable { mutableStateOf(LocalDate.now(java.time.ZoneId.of("America/Sao_Paulo")).toString()) }
-    var detail by remember { mutableStateOf<ContentCard?>(null) }
-    var playing by remember { mutableStateOf<ContentCard?>(null) }
+    var detail by rememberSaveable(stateSaver = cardSaver) { mutableStateOf<ContentCard?>(null) }
+    var playing by rememberSaveable(stateSaver = cardSaver) { mutableStateOf<ContentCard?>(null) }
     var lastCard by rememberSaveable { mutableStateOf("") }
-    var restoreFocus by remember { mutableStateOf(false) }
+    var restoreFocus by rememberSaveable { mutableStateOf(false) }
     val verticalState = rememberLazyListState()
-    val rowStates = remember { mutableMapOf<String, LazyListState>() }
+    val rowStates = rememberSaveable(saver = scrollSaver) { mutableMapOf<String, LazyListState>() }
     val initialFocus = remember { FocusRequester() }
-    LaunchedEffect(Unit) { initialFocus.requestFocus() }
+    LaunchedEffect(Unit) { model.load(page, query, date) }
+    LaunchedEffect(playing, detail) { if(playing == null && detail == null && !restoreFocus) initialFocus.requestFocus() }
     val state by model.state.collectAsStateWithLifecycle()
-    fun navigate(value: String) { page = value; query = ""; model.load(value, date = date) }
-    BackHandler(enabled = playing == null && (detail != null || page != "Início")) { if(detail != null) { detail = null; restoreFocus = true } else navigate("Início") }
-    if(playing != null) { PlaybackScreen(playing!!, model.repository) { playing = null }; return }
+    val network by model.network.collectAsStateWithLifecycle()
+    LaunchedEffect(restoreFocus, state.sections, state.loading, detail) {
+        if(restoreFocus && !state.loading && detail == null && state.sections.none { section -> section.items.any { "${section.id}/${it.id}" == lastCard } }) {
+            initialFocus.requestFocus(); restoreFocus = false
+        }
+    }
+    fun navigate(value: String) { page = value; query = ""; restoreFocus = false; model.load(value, date = date) }
+    fun closeDetail() { detail = null; model.refreshLocal(); restoreFocus = true }
+    BackHandler(enabled = playing == null && (detail != null || page != "Início")) { if(detail != null) closeDetail() else navigate("Início") }
+    if(playing != null) { PlaybackScreen(playing!!, model.repository, network) { playing = null; model.refreshLocal() }; return }
     Row(Modifier.fillMaxSize().background(Color(0xFF0C101B)).padding(24.dp)) {
         Column(Modifier.width(175.dp).fillMaxHeight()) {
             Text("IA TV", fontSize = 32.sp, color = Color(0xFF65E4C5))
@@ -67,14 +86,14 @@ private val menu = listOf("Início", "TV ao Vivo", "Filmes", "Séries", "YouTube
         Spacer(Modifier.width(28.dp))
         Box(Modifier.weight(1f).fillMaxHeight()) {
             if(detail != null) {
-                Detail(detail!!, model, onBack = { detail = null; restoreFocus = true }, onPlay = { playing = detail }, onAi = { val title = detail!!.title; detail = null; navigate("Assistente IA"); query = "Recomende um filme como $title"; model.load(page, query) })
+                Detail(detail!!, model, onBack = { closeDetail() }, onPlay = { playing = detail }, onAi = { val title = detail!!.title; detail = null; navigate("Assistente IA"); query = "Recomende um filme como $title"; model.load(page, query) })
             } else Column {
                 Text(if(page == "Início") "Olá.\nO que você quer assistir?" else page, fontSize = 30.sp)
                 Text("Tudo o que você quer assistir, em um só lugar. • DEMONSTRAÇÃO", fontSize = 11.sp, color = Color(0xFF9EABBF))
                 Spacer(Modifier.height(12.dp))
                 if(page == "Busca" || page == "Assistente IA") {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        OutlinedTextField(value = query, onValueChange = { query = it.take(500) }, singleLine = true, label = { Text(if(page == "Busca") "Buscar no catálogo" else "Pergunte à IA TV") }, modifier = Modifier.weight(1f))
+                        OutlinedTextField(value = query, onValueChange = { query = it.take(if(page == "Busca") 120 else 500) }, singleLine = true, label = { Text(if(page == "Busca") "Buscar no catálogo" else "Pergunte à IA TV") }, modifier = Modifier.weight(1f))
                         TvButton(onClick = { model.load(page, query) }, modifier = Modifier.padding(top = 8.dp)) { Text("Enviar") }
                     }
                     if(page == "Assistente IA") Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Quais jogos têm hoje?", "Quero uma comédia").forEach { suggestion -> TvButton(onClick = { query = suggestion; model.load(page, query) }) { Text(suggestion, fontSize = 12.sp) } } }
@@ -84,8 +103,11 @@ private val menu = listOf("Início", "TV ao Vivo", "Filmes", "Séries", "YouTube
                     Text(date, Modifier.padding(10.dp))
                     TvButton(onClick = { date = LocalDate.parse(date).plusDays(1).toString(); model.load(page, date = date) }) { Text("Próximo dia ›") }
                 }
-                if(page == "Perfil" || page == "Configurações") {
-                    Text(if(page == "Perfil") "Perfil local de demonstração\nFavoritos e progresso ficam neste aparelho. Contas e sincronização serão adicionadas em outro milestone." else "IA TV 0.1.0\nCatálogo fictício • Assistente mock\nUse as setas, OK e Voltar. Voz ainda não disponível.", Modifier.padding(top = 24.dp))
+                if(network == NetworkState.Disconnected) Text("Sem conexão com a internet.", color = Color(0xFFFFCA80))
+                if(page == "Configurações") {
+                    DiagnosticsScreen(model.repository.api)
+                } else if(page == "Perfil") {
+                    Text("Perfil local de demonstração\nFavoritos e progresso ficam neste aparelho. Contas e sincronização serão adicionadas em outro milestone.", Modifier.padding(top = 24.dp))
                 } else {
                     if(state.loading) { CircularProgressIndicator(); Text("Carregando…") }
                     state.notice?.let { Text(it, color = Color(0xFFFFCA80)); TvButton(onClick = { model.load(page, query, date) }) { Text("Tentar novamente") } }
@@ -99,7 +121,7 @@ private val menu = listOf("Início", "TV ao Vivo", "Filmes", "Séries", "YouTube
                                         val focusId = "${section.id}/${item.id}"
                                         val requester = remember { FocusRequester() }
                                         LaunchedEffect(restoreFocus) { if(restoreFocus && focusId == lastCard) { requester.requestFocus(); restoreFocus = false } }
-                                        TvCard(item, Modifier.focusRequester(requester), onFocus = { lastCard = focusId }) { detail = item }
+                                        TvCard(item, Modifier.focusRequester(requester), onFocus = { lastCard = focusId }) { DebugTelemetry.event("content_open"); detail = item }
                                     }
                                 }
                             }
@@ -115,14 +137,14 @@ private val menu = listOf("Início", "TV ao Vivo", "Filmes", "Séries", "YouTube
     LaunchedEffect(item.id) { actionFocus.requestFocus() }
     var favorite by remember(item.id) { mutableStateOf(item.id in model.repository.favorites()) }
     var epg by remember(item.id) { mutableStateOf<List<EpgProgram>>(emptyList()) }
-    LaunchedEffect(item.id) { if(item.kind == "channel") epg = runCatching { model.repository.api.epg(item.id) }.getOrDefault(emptyList()) }
+    LaunchedEffect(item.id) { if(item.kind == "channel") try { epg = model.repository.api.epg(item.id) } catch(cancelled: kotlinx.coroutines.CancellationException) { throw cancelled } catch(_: Exception) { epg = emptyList() } }
     LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
         item { Text(item.badge, color = Color(0xFF65E4C5)); Text(item.title, fontSize = 36.sp) }
         item { Text(item.overview, fontSize = 20.sp) }
         item { Text("${item.category}${if(item.durationMinutes > 0) " • ${item.durationMinutes} min" else ""}", color = Color(0xFF9EABBF)) }
         item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             TvButton(onClick = onPlay, enabled = item.playable, modifier = if(item.playable) Modifier.focusRequester(actionFocus) else Modifier) { Text(if(item.playable) "Assistir demo" else "Sem transmissão") }
-            TvButton(onClick = { model.repository.toggleFavorite(item.id); favorite = !favorite }, modifier = if(!item.playable) Modifier.focusRequester(actionFocus) else Modifier) { Text(if(favorite) "✓ Na minha lista" else "+ Minha lista") }
+            TvButton(onClick = { model.repository.toggleFavorite(item.id); favorite = !favorite; if(favorite) DebugTelemetry.event("favorite_added") }, modifier = if(!item.playable) Modifier.focusRequester(actionFocus) else Modifier) { Text(if(favorite) "✓ Na minha lista" else "+ Minha lista") }
         } }
         item { Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) { TvButton(onClick = onAi) { Text("Perguntar à IA") }; TvButton(onClick = onBack) { Text("Voltar") } } }
         if(item.kind == "channel") { item { Text("Guia de programação • fictício", fontSize = 22.sp) }; items(epg.take(6)) { program -> Text("${java.time.Instant.parse(program.startAt).atZone(java.time.ZoneId.of("America/Sao_Paulo")).toLocalTime()} — ${program.title}") } }

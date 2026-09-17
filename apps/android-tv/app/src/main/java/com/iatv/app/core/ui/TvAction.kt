@@ -13,9 +13,10 @@ import androidx.tv.material3.ButtonDefaults
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    loading: Boolean = false,
     content: @Composable RowScope.() -> Unit
 ) {
-    Button(onClick = onClick, modifier = modifier, enabled = enabled,
+    Button(onClick = onClick, modifier = modifier, enabled = enabled && !loading,
         colors = ButtonDefaults.colors(
             containerColor = Color(0xFF1D2738),
             contentColor = Color(0xFFEAF2FA),
@@ -25,7 +26,7 @@ import androidx.tv.material3.ButtonDefaults
             disabledContentColor = Color(0xFF77849A)
         )) {
         CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides androidx.tv.material3.LocalContentColor.current) {
-            content()
+            if(loading) androidx.compose.material3.Text("Carregando…") else content()
         }
     }
 }

@@ -9,5 +9,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 @Module @InstallIn(SingletonComponent::class)
 object NetworkModule {
-    @Provides @Singleton fun api(): TvApi = Retrofit.Builder().baseUrl(BuildConfig.API_URL).addConverterFactory(GsonConverterFactory.create()).build().create(TvApi::class.java)
+    @Provides @Singleton fun api(): TvApi {
+        val client = okhttp3.OkHttpClient.Builder()
+            .connectTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
+            .readTimeout(20, java.util.concurrent.TimeUnit.SECONDS)
+            .writeTimeout(15, java.util.concurrent.TimeUnit.SECONDS)
+            .callTimeout(30, java.util.concurrent.TimeUnit.SECONDS)
+            .retryOnConnectionFailure(false)
+            .addInterceptor { chain -> chain.proceed(chain.request().newBuilder().header("X-Request-Id", java.util.UUID.randomUUID().toString()).build()) }
+            .build()
+        return Retrofit.Builder().baseUrl(BuildConfig.API_URL).client(client).addConverterFactory(GsonConverterFactory.create()).build().create(TvApi::class.java)
+    }
 }

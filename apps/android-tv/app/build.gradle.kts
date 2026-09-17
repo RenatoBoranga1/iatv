@@ -12,8 +12,10 @@ android {
         applicationId = "com.iatv.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
+        val commit = providers.environmentVariable("GITHUB_SHA").orElse(providers.gradleProperty("IATV_GIT_COMMIT")).getOrElse("local")
+        buildConfigField("String", "GIT_COMMIT", "\"${commit.filter { it.isLetterOrDigit() }.take(12)}\"")
         val apiUrl = providers.gradleProperty("IATV_API_URL").getOrElse("http://10.0.2.2:3000/")
         require(apiUrl.matches(Regex("https?://[a-zA-Z0-9.\\-:]+/"))) { "IATV_API_URL precisa ser uma URL base HTTP(S) terminada em /" }
         buildConfigField("String", "API_URL", "\"$apiUrl\"")
