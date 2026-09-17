@@ -35,6 +35,8 @@ import com.iatv.app.core.network.NetworkState
     val retryFocus = remember { FocusRequester() }
     LaunchedEffect(state) { if(state is PlayerState.Error || state == PlayerState.Ended) retryFocus.requestFocus() }
     var epg by remember { mutableStateOf("") }
+    var trackDialog by remember { mutableStateOf<android.app.Dialog?>(null) }
+    DisposableEffect(controller.player) { onDispose { trackDialog?.dismiss(); trackDialog = null } }
     BackHandler(onBack = onBack)
     DisposableEffect(controller, owner) {
         val observer = LifecycleEventObserver { _, event -> when(event) {
@@ -79,7 +81,10 @@ import com.iatv.app.core.network.NetworkState
         if(player != null) {
             if(overlay || toolbarFocused) Row(modifier = Modifier.onFocusChanged { toolbarFocused = it.hasFocus }, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 listOf("Áudio" to C.TRACK_TYPE_AUDIO, "Legenda" to C.TRACK_TYPE_TEXT, "Qualidade" to C.TRACK_TYPE_VIDEO).forEach { (label, type) ->
-                    Button(onClick = { TrackSelectionDialogBuilder(context, label, player, type).build().show() }) { Text(label) }
+                    Button(onClick = {
+                        trackDialog?.dismiss()
+                        trackDialog = TrackSelectionDialogBuilder(context, label, player, type).build().also { it.show() }
+                    }) { Text(label) }
                 }
             }
             AndroidView(factory = { PlayerView(it).apply {
@@ -87,7 +92,12 @@ import com.iatv.app.core.network.NetworkState
                 setShowSubtitleButton(true)
                 setControllerVisibilityListener(PlayerView.ControllerVisibilityListener { visibility -> overlay = visibility == android.view.View.VISIBLE })
                 requestFocus()
-            } }, update = { it.player = player }, onRelease = { it.player = null; it.setControllerVisibilityListener(null as PlayerView.ControllerVisibilityListener?) }, modifier = Modifier.fillMaxWidth().weight(1f))
+            } }, update = { view ->
+                if(view.player !== player) {
+                    view.player = player
+                    view.post { if(view.player === player) { view.requestFocus(); view.showController() } }
+                }
+            }, onRelease = { it.player = null; it.setControllerVisibilityListener(null as PlayerView.ControllerVisibilityListener?) }, modifier = Modifier.fillMaxWidth().weight(1f))
         }
     }
 }

@@ -13,6 +13,9 @@ de três tentativas por sessão, sem reset automático ao receber um frame ou al
 Retry explícito do usuário renova o orçamento. Timeout de buffering: 30 segundos.
 Media3 não tem uma segunda política de tentativas escondida (minimum retry count 0).
 Decoder/formato/source exigem ação do usuário. Um manifesto live controla sua própria
+janela. Behind-live-window e 404 de segmento live podem renovar o manifesto dentro do mesmo
+orçamento de três tentativas; HTTP 429/5xx também são transitórios. 404 VOD é erro de fonte.
+Um manifesto live controla sua própria
 janela; somente o MP4 fictício legado repete como demonstração.
 
 API: connect 10s, read 20s, write 15s, call 30s. Streaming: connect 10s/read 15s.

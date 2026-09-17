@@ -1,6 +1,6 @@
 # Milestone 2 — hardening
 
-Estado: implementação em validação. Aprovação em dispositivo físico pendente.
+Estado: hardening implementado; aprovação em dispositivo físico pendente.
 Base auditada em [baseline](milestone-2-baseline.md); branch `milestone-2-hardening`.
 
 ## Mudanças
@@ -55,6 +55,8 @@ Supertest 7.1.1 e ESLint 9.28 também emitem depreciação; cobertura e lint con
 | Verificação | Resultado |
 | --- | --- |
 | Backend build/lint | PASS |
+| npm ci e Prisma generate | PASS após encerrar API local que mantinha DLL aberta |
+| Build admin Next.js | PASS |
 | Backend testes REST | PASS — 10 testes |
 | PostgreSQL vazio → migration → seed duas vezes → API | PASS em PostgreSQL isolado local |
 | Compose config | PASS |
@@ -62,8 +64,8 @@ Supertest 7.1.1 e ESLint 9.28 também emitem depreciação; cobertura e lint con
 | Android assembleDebug | PASS |
 | Android testes | PASS — 7 testes |
 | Android lint | PASS — 0 erros, 18 warnings |
-| Runtime emulador M2 | Em execução; atualizar com resultados observados |
-| GitHub Actions M2 | Pendente push/execução |
+| Runtime emulador M2 | MP4, HLS VOD, DASH VOD, HLS live próprio, erro/retry, Back e diagnóstico observados |
+| GitHub Actions M2 | Backend e Android PASS no run 35215468073; correções finais terão novo run |
 | TV física / standby / Wi-Fi fabricante / 2h | REQUIRES_PHYSICAL_DEVICE |
 
 Avisos: versões Android mais novas, target SDK, banner, orientação TV, backup, KTX;
@@ -72,6 +74,34 @@ Uma rodada intermediária compilou testes enquanto fontes mudavam; outra expôs 
 dispatcher de testes antes de cancelar coroutines. Corrigido e suíte reexecutada com sucesso.
 O primeiro CI M2 encontrou verificador de banco ainda esperando dataMode no health;
 atualizado para o contrato seguro status/database. Nenhum teste desativado.
+
+## Evidência de execução Android TV API 34 x86
+
+Instalação/atualização APK, Home, abertura de canal e filme via D-Pad; Back do player
+foca Assistir, Back do detalhe restaura Aurora TV. Falha de API esgota três tentativas
+em 2/4/8 segundos e coloca foco em Tentar novamente. Sem crash observado nesse fluxo.
+
+HLS live próprio chegou ao primeiro frame em 2378ms. MP4 VOD: 1058ms; retorno do
+background: 1228ms; DASH: 611ms; HLS VOD: 991ms. Valores pontuais do emulador,
+não benchmark nem promessa de desempenho. Cada formato VOD emitiu play_completed.
+WatchProgress inspecionado com positionMs=20000, durationMs=20000, percentage=100,
+completed=true e updatedAt. Nenhuma requisição de progresso por segundo.
+
+Lifecycle observado: player_released em 15:56:34, novo player_created em 15:56:36,
+primeiro frame em 15:56:37 (horários UTC do logcat). Não houve instâncias simultâneas
+nessa sequência. Um snapshot anterior mostrou PSS ~72MiB; insuficiente para afirmar
+estabilidade de memória por duas horas. Gerador live ficar ligado não equivale a player validado 2h.
+
+Configurações → Sobre → Diagnóstico acessível por D-Pad, API Conectado, versão 0.2.0,
+Android/modelo e Copiar informações focado; captura em screenshots/android-tv-diagnostics.png.
+O emulador manteve conectividade via outra interface ao desligar Wi-Fi; não se reivindica
+teste real de perda/retorno de Wi-Fi. Falha de servidor e recuperação foram testadas;
+transição de conectividade também coberta por teste de ViewModel. Fabricantes exigem gate físico.
+
+Após sessão prolongada do gerador, segmento HLS expirado retornou 404; recuperação de
+janela live ficou limitada ao mesmo orçamento. O gerador passou a reter mais segmentos
+e publicar manifesto atomicamente. Também corrigida saída DASH que colocava segmentos
+na raiz em vez da pasta da mídia. Diálogos de trilhas são dispensados ao liberar o player.
 
 Não considerar milestone aprovado por teste físico até preencher [resultados](physical-tv-test-results.md).
 Progresso/favoritos são locais, sincronização remota não existe. EPG é fictício; nenhum servidor

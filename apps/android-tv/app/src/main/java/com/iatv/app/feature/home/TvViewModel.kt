@@ -71,7 +71,7 @@ data class TvState(val status: ScreenStatus = ScreenStatus.Loading, val sections
             } catch(cancelled: CancellationException) { throw cancelled }
             catch(error: Exception) {
                 telemetry.error("screen_error", error.javaClass.simpleName)
-                val offline = error is java.io.IOException
+                val offline = error is java.io.IOException && error !is com.google.gson.stream.MalformedJsonException
                 val cache = repository.cachedHome()?.sections.orEmpty()
                 val available = when(page) {
                     "Início" -> repository.personalize(cache)

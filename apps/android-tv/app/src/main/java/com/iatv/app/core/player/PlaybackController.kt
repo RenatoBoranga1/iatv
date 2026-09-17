@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.media3.common.*
 import androidx.media3.datasource.DefaultHttpDataSource
+import androidx.media3.datasource.HttpDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.exoplayer.upstream.DefaultLoadErrorHandlingPolicy
@@ -144,12 +145,17 @@ class PlaybackController(private val context: Context, private val item: Content
                 DebugTelemetry.timing("time_to_first_frame_ms", SystemClock.elapsedRealtime() - requestedAt)
             }
         }
-        override fun onPlayerError(error: PlaybackException) { fail(classify(error)) }
+        override fun onPlayerError(error: PlaybackException) { DebugTelemetry.error("media3_error", error.errorCodeName); fail(classify(error)) }
     }
     private fun classify(error: Exception): PlaybackError = when(error) {
         is SocketTimeoutException -> PlaybackError.TIMEOUT
         is HttpException -> if(error.code() >= 500 || error.code() == 429) PlaybackError.NETWORK_ERROR else PlaybackError.SOURCE_ERROR
         is PlaybackException -> when(error.errorCode) {
+            PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> PlaybackError.NETWORK_ERROR
+            PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> {
+                val status = (error.cause as? HttpDataSource.InvalidResponseCodeException)?.responseCode
+                if(status == 429 || (status != null && status >= 500) || (item.kind == "channel" && status == 404)) PlaybackError.NETWORK_ERROR else PlaybackError.SOURCE_ERROR
+            }
             PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> PlaybackError.TIMEOUT
             PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> PlaybackError.NETWORK_ERROR
             PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED -> PlaybackError.DECODER_ERROR

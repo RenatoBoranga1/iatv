@@ -27,7 +27,7 @@ data class DeviceInfo(val manufacturer: String, val model: String, val androidVe
     val info = remember { DeviceInfo.current() }
     val clipboard = LocalClipboardManager.current
     val first = remember { FocusRequester() }
-    LaunchedEffect(page) { if(page > 0) first.requestFocus() }
+    LaunchedEffect(page) { first.requestFocus() }
     androidx.activity.compose.BackHandler(page > 0) { page-- }
     LaunchedEffect(page, attempt) {
         if(page == 2) {
@@ -37,7 +37,7 @@ data class DeviceInfo(val manufacturer: String, val model: String, val androidVe
     }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         when(page) {
-            0 -> TvAction(onClick = { page = 1 }) { Text("Sobre") }
+            0 -> TvAction(onClick = { page = 1 }, modifier = Modifier.focusRequester(first)) { Text("Sobre") }
             1 -> { Text("IA TV • catálogo de demonstração"); TvAction(onClick = { page = 2 }, modifier = Modifier.focusRequester(first)) { Text("Diagnóstico") } }
             else -> {
                 val report = "IA TV\nVersão: ${info.appVersion} (${BuildConfig.VERSION_CODE})\nBuild: ${BuildConfig.GIT_COMMIT} / ${BuildConfig.BUILD_TYPE}\nAndroid: ${info.androidVersion} / SDK ${info.sdkVersion}\nDispositivo: ${info.manufacturer} ${info.model}\nAPI: $apiStatus\nPlayer: Media3"
