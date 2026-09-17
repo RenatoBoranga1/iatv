@@ -12,3 +12,7 @@ local.properties
 coverage/
 *.tsbuildinfo
 .kotlin/
+*.jks
+*.keystore
+*.p12
+apps/backend/media/generated/

@@ -15,7 +15,9 @@ import {
   IsString,
   MaxLength,
   MinLength,
+  Matches,
 } from "class-validator";
+import { Throttle } from "@nestjs/throttler";
 import { CatalogService } from "./catalog.service";
 import { MockAiProvider } from "./ai.service";
 import {
@@ -31,7 +33,10 @@ class ChatDto {
   @ApiProperty() @IsString() @MinLength(1) @MaxLength(500) message!: string;
 }
 class DateDto {
-  @IsOptional() @IsDateString({ strict: true }) date?: string;
+  @IsOptional() @Matches(/^\d{4}-\d{2}-\d{2}$/) @IsDateString({ strict: true }) date?: string;
+}
+class ContentIdDto {
+  @IsString() @Matches(/^[a-z0-9][a-z0-9-]{0,79}$/) id!: string;
 }
 @ApiTags("IA TV • demonstração")
 @Controller("v1")
@@ -44,12 +49,9 @@ export class ApiController {
     @Inject(Database) private db: Database,
   ) {}
   @Get("health") async health() {
-    if (process.env.DATA_MODE !== "mock") await this.db.$queryRaw`SELECT 1`;
-    return {
-      status: "ok",
-      dataMode: process.env.DATA_MODE || "postgres",
-      mockContent: true,
-    };
+    if (process.env.DATA_MODE === "mock") return { status: "ok", database: "not_configured" };
+    try { await this.db.$queryRaw`SELECT 1`; } catch { throw new ServiceUnavailableException(); }
+    return { status: "ok", database: "ok" };
   }
   @Get("home") home() {
     return this.catalog.home();
@@ -57,8 +59,8 @@ export class ApiController {
   @Get("catalog") all() {
     return this.catalog.all();
   }
-  @Get("catalog/:id") get(@Param("id") id: string) {
-    return this.catalog.get(id);
+  @Get("catalog/:id") get(@Param() params: ContentIdDto) {
+    return this.catalog.get(params.id);
   }
   @Get("search") search(@Query() dto: SearchDto) {
     return this.catalog.search(dto.q);
@@ -69,27 +71,30 @@ export class ApiController {
   @Get("live/categories") categories() {
     return this.live.getCategories();
   }
-  @Get("live/:id/epg") async epg(@Param("id") id: string) {
-    await this.catalog.get(id);
-    return this.live.getEpg(id);
+  @Get("live/:id/epg") async epg(@Param() params: ContentIdDto) {
+    await this.catalog.get(params.id);
+    return this.live.getEpg(params.id);
   }
+  @Throttle({ default: { limit: 30, ttl: 60000 } })
   @Post("ai/chat") chat(@Body() dto: ChatDto) {
     return this.ai.chat(dto.message);
   }
-  @Get("playback/:id") async playback(@Param("id") id: string) {
+  @Get("playback/:id") async playback(@Param() params: ContentIdDto) {
+    const id = params.id;
     const item = await this.catalog.get(id);
     if (!item.playable)
       throw new ServiceUnavailableException(
         "Este conteúdo não possui transmissão autorizada.",
       );
-    if (!process.env.DEMO_MEDIA_URL)
+    const url = (item.kind === "channel" ? process.env.DEMO_LIVE_URL : undefined) || process.env.DEMO_MEDIA_URL;
+    if (!url)
       throw new ServiceUnavailableException(
         "Sinal de teste indisponível. Gere a mídia própria conforme o README.",
       );
     return {
       contentId: id,
-      url: process.env.DEMO_MEDIA_URL,
-      mimeType: "video/mp4",
+      url,
+      mimeType: new URL(url).pathname.endsWith(".m3u8") ? "application/x-mpegURL" : new URL(url).pathname.endsWith(".mpd") ? "application/dash+xml" : "video/mp4",
       isLive: item.kind === "channel",
       demo: true,
     };
@@ -110,6 +115,8 @@ export class ApiController {
       subscriptions_enabled: false,
       voice_enabled: false,
       kids_profile_enabled: false,
+      mobile_pairing_enabled: false,
+      telemetry_enabled: false,
     };
   }
 }

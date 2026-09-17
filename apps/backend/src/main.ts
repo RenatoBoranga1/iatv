@@ -17,11 +17,15 @@ export function validateEnvironment() {
     throw new Error("DATABASE_URL PostgreSQL obrigatória");
   if (process.env.NODE_ENV === "production" && process.env.DATA_MODE === "mock")
     throw new Error("Modo mock em memória restrito a desenvolvimento");
-  if (
-    process.env.DEMO_MEDIA_URL &&
-    !/^https?:\/\//.test(process.env.DEMO_MEDIA_URL)
-  )
-    throw new Error("DEMO_MEDIA_URL deve ser HTTP(S)");
+  for (const name of ["DEMO_MEDIA_URL", "DEMO_LIVE_URL"]) {
+    const value = process.env[name];
+    if (!value) continue;
+    const url = new URL(value);
+    if (!["http:", "https:"].includes(url.protocol) || url.username || url.password)
+      throw new Error(`${name} deve ser HTTP(S), sem credenciais`);
+  }
+  const port = Number(process.env.PORT || 3000);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("PORT inválida");
 }
 async function bootstrap() {
   validateEnvironment();

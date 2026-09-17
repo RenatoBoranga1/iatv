@@ -21,7 +21,7 @@ export class CatalogService {
     >;
   }
   async get(id: string) {
-    const item = (await this.all()).find((c) => c.id === id);
+    const item = process.env.DATA_MODE === "mock" ? catalog.find((c) => c.id === id) : await this.db.content.findUnique({ where: { id } });
     if (!item) throw new NotFoundException("Conteúdo não encontrado.");
     return item;
   }

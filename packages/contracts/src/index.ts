@@ -78,3 +78,32 @@ export interface AssistantResponse {
   cards: ContentCard[];
   mock: boolean;
 }
+
+export interface ApiError {
+  code: string;
+  message: string;
+  requestId: string;
+}
+export interface WatchProgress {
+  positionMs: number;
+  durationMs: number;
+  percentage: number;
+  updatedAt: string;
+  completed: boolean;
+}
+/** Design contract only; no remote control endpoint exists in M2. */
+export type RemoteCommand =
+  | { type: "UP" | "DOWN" | "LEFT" | "RIGHT" | "SELECT" | "BACK" | "PLAY" | "PAUSE" }
+  | { type: "SEEK"; positionMs: number }
+  | { type: "OPEN_CONTENT" | "OPEN_CHANNEL"; contentId: string }
+  | { type: "SEARCH"; query: string }
+  | { type: "AI_COMMAND"; text: string };
+export interface RemoteEnvelope {
+  protocolVersion: 1;
+  commandId: string;
+  sessionId: string;
+  sequence: number;
+  issuedAt: string;
+  expiresAt: string;
+  command: RemoteCommand;
+}

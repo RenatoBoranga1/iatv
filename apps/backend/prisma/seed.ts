@@ -14,6 +14,8 @@ async function seed() {
     "subscriptions_enabled",
     "voice_enabled",
     "kids_profile_enabled",
+    "mobile_pairing_enabled",
+    "telemetry_enabled",
   ]) {
     await db.featureFlag.upsert({
       where: { key },
