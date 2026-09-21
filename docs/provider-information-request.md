@@ -15,5 +15,3 @@ Instalação confirmada; inicialização falha com ClassCastException Long→Int
 Necessário dispositivo/imagem compatível, começando por API 29, com conta autorizada.
 Necessária evidência: instalação bem-sucedida, abertura, trace sanitizado,
 socket correlacionado e primeiro frame. Não substituir por stream de demonstração.
-
-

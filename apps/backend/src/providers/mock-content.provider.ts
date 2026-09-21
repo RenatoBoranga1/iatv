@@ -33,4 +33,3 @@ export class MockContentProvider implements ContentProvider {
     };
   }
 }
-

@@ -38,4 +38,9 @@ Nenhum segredo extraído, token forjado ou mecanismo de limites contornado.
 Confirmar launch, sessão autorizada, dois canais, URI/formato; implementar somente
 contratos observados, executar live 10 minutos e depois filme/episódio.
 
+## Publicação e CI
+Branch publicada em 21/09: milestone-2.5-provider-integration.
+GitHub Actions no commit 132f3fd: backend e Android SUCCESS.
+Execução: https://github.com/RenatoBoranga1/iatv/actions/runs/35594246468
+Varredura de segredos revisada: nomes de contratos, marcadores de redação e credenciais sintéticas de teste; nenhum segredo real incluído. APK, capturas e dados de runtime ficaram fora do Git.
 

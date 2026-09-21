@@ -52,4 +52,3 @@ Não salvar logcat bruto, HAR, PCAP ou memória como relatório.
 
 ## Bloqueio confirmado em 21/09
 BLOCKED_BY_RUNTIME_ENVIRONMENT: incompatibilidade de inicialização nesta imagem API 34 x86. Precisamos de imagem/dispositivo compatível (testar Android 10/API 29 primeiro) ou build corrigido do legado. SDK local só possui imagens 36.1/37.1 além da imagem 34 de pesquisa; cmdline-tools ausente. Não corrigir o cast por patch binário sem compreender o comportamento. BLOCKED_BY_PROVIDER_INFORMATION também permanece: sessão de teste/contrato não recebido.
-
