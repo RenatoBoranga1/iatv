@@ -21,11 +21,11 @@ import { Throttle } from "@nestjs/throttler";
 import { CatalogService } from "./catalog.service";
 import { MockAiProvider } from "./ai.service";
 import {
-  MockLiveTvProvider,
   MockSportsProvider,
   today,
 } from "./providers/catalog";
 import { Database } from "./database";
+import { ContentProviderFactory } from "./providers/content-provider.factory";
 class SearchDto {
   @ApiProperty() @IsString() @MaxLength(120) q = "";
 }
@@ -45,59 +45,46 @@ export class ApiController {
     @Inject(CatalogService) private catalog: CatalogService,
     @Inject(MockAiProvider) private ai: MockAiProvider,
     @Inject(MockSportsProvider) private sports: MockSportsProvider,
-    @Inject(MockLiveTvProvider) private live: MockLiveTvProvider,
     @Inject(Database) private db: Database,
+    @Inject(ContentProviderFactory) private providers: ContentProviderFactory,
   ) {}
   @Get("health") async health() {
     if (process.env.DATA_MODE === "mock") return { status: "ok", database: "not_configured" };
     try { await this.db.$queryRaw`SELECT 1`; } catch { throw new ServiceUnavailableException(); }
     return { status: "ok", database: "ok" };
   }
-  @Get("home") home() {
+  @Get("home") async home() {
+    await this.providers.requireCatalogContract();
     return this.catalog.home();
   }
-  @Get("catalog") all() {
+  @Get("catalog") async all() {
+    await this.providers.requireCatalogContract();
     return this.catalog.all();
   }
-  @Get("catalog/:id") get(@Param() params: ContentIdDto) {
+  @Get("catalog/:id") async get(@Param() params: ContentIdDto) {
+    await this.providers.requireCatalogContract();
     return this.catalog.get(params.id);
   }
-  @Get("search") search(@Query() dto: SearchDto) {
+  @Get("search") async search(@Query() dto: SearchDto) {
+    await this.providers.requireCatalogContract();
     return this.catalog.search(dto.q);
   }
   @Get("sports") events(@Query() dto: DateDto) {
     return this.sports.getEventsByDate(dto.date?.slice(0, 10) || today());
   }
   @Get("live/categories") categories() {
-    return this.live.getCategories();
+    return this.providers.provider.getLiveCategories({}).then(items => items.map(item => item.name));
   }
   @Get("live/:id/epg") async epg(@Param() params: ContentIdDto) {
-    await this.catalog.get(params.id);
-    return this.live.getEpg(params.id);
+    return this.providers.provider.getEpg({}, params.id);
   }
   @Throttle({ default: { limit: 30, ttl: 60000 } })
-  @Post("ai/chat") chat(@Body() dto: ChatDto) {
+  @Post("ai/chat") async chat(@Body() dto: ChatDto) {
+    await this.providers.requireCatalogContract();
     return this.ai.chat(dto.message);
   }
   @Get("playback/:id") async playback(@Param() params: ContentIdDto) {
-    const id = params.id;
-    const item = await this.catalog.get(id);
-    if (!item.playable)
-      throw new ServiceUnavailableException(
-        "Este conteúdo não possui transmissão autorizada.",
-      );
-    const url = (item.kind === "channel" ? process.env.DEMO_LIVE_URL : undefined) || process.env.DEMO_MEDIA_URL;
-    if (!url)
-      throw new ServiceUnavailableException(
-        "Sinal de teste indisponível. Gere a mídia própria conforme o README.",
-      );
-    return {
-      contentId: id,
-      url,
-      mimeType: new URL(url).pathname.endsWith(".m3u8") ? "application/x-mpegURL" : new URL(url).pathname.endsWith(".mpd") ? "application/dash+xml" : "video/mp4",
-      isLive: item.kind === "channel",
-      demo: true,
-    };
+    return this.providers.provider.getPlayback({}, params.id);
   }
   @Get("config") async config() {
     if (process.env.DATA_MODE !== "mock") {

@@ -20,11 +20,25 @@ export interface HomeResponse {
   mock: true;
 }
 export interface PlaybackSource {
+  live: boolean;
+  protocol: "HLS" | "DASH" | "MPEG_TS" | "MP4" | "LOCAL_GATEWAY";
+  variants: PlaybackVariant[];
+  expiresAt?: string;
   contentId: string;
   url: string;
   mimeType: string;
   isLive: boolean;
   demo: boolean;
+}
+export interface PlaybackVariant {
+  id: string;
+  url: string;
+  priority: number;
+  quality?: string;
+  width?: number;
+  height?: number;
+  bitrate?: number;
+  headers?: Record<string, string>;
 }
 export interface EpgProgram {
   id: string;

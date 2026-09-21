@@ -1,6 +1,7 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException } from "@nestjs/common";
 import { Request, Response } from "express";
 import { randomUUID } from "node:crypto";
+import { ProviderError } from "./providers/brasiltv/brasil-tv.errors";
 
 const codes: Record<number, string> = {
   400: "INVALID_REQUEST", 401: "UNAUTHORIZED", 403: "FORBIDDEN",
@@ -17,7 +18,7 @@ export class SafeErrorFilter implements ExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
     const status = error instanceof HttpException ? error.getStatus() : 500;
     response.status(status).json({
-      code: codes[status] || "INTERNAL_ERROR",
+      code: error instanceof ProviderError ? error.code : codes[status] || "INTERNAL_ERROR",
       message: messages[status] || "Serviço temporariamente indisponível.",
       requestId: response.getHeader("X-Request-Id") || randomUUID(),
     });

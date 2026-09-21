@@ -6,11 +6,14 @@ import { CatalogService } from "./catalog.service";
 import { AuthorizedTools, MockAiProvider } from "./ai.service";
 import { MockLiveTvProvider, MockSportsProvider } from "./providers/catalog";
 import { ApiController } from "./controller";
+import { ContentProviderFactory } from "./providers/content-provider.factory";
+import { ProviderAdminController } from "./providers/provider-admin.controller";
 @Module({
   imports: [ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }])],
-  controllers: [ApiController],
+  controllers: [ApiController, ProviderAdminController],
   providers: [
     Database,
+    ContentProviderFactory,
     CatalogService,
     AuthorizedTools,
     MockAiProvider,
