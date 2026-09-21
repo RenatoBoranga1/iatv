@@ -89,3 +89,6 @@ localmente usar `-PIATV_GIT_COMMIT=HASH`. Os dados copiados não incluem URL ou 
 Home com menu e carrosséis, detalhes, catálogo fictício, agenda diária, busca, assistente mock, guia fictício e player de demonstração. Favoritos/cache/progresso locais no perfil demonstrativo. Admin apenas estrutural. Canais repetem sinal próprio, não uma transmissão ao vivo real. Séries ainda são cards demonstrativos, sem seleção de temporadas.
 
 Auth, QR, múltiplos perfis, sincronização, pagamentos e integrações reais ficam fora desta primeira entrega. Veja [arquitetura](docs/architecture.md), [guia Android](docs/android-tv.md) e [próximo milestone](docs/roadmap.md).
+
+## Milestone 2.5 — em andamento
+Fundação de providers, diagnósticos administrativos e pesquisa do APK 5.2: [estado e bloqueios](docs/milestone-2.5.md). Integração e playback reais ainda não validados. Consulte a [matriz de contratos](docs/provider-contract-matrix.md).

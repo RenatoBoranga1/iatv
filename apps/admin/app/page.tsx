@@ -21,7 +21,7 @@ export default function Page() {
         <p>Administração</p>
         <nav aria-label="Módulos planejados">
           {areas.map((area) => (
-            <span key={area}>{area}</span>
+            area === "Provedores" ? <a key={area} href="/providers/brasiltv">{area}</a> : <span key={area}>{area}</span>
           ))}
         </nav>
       </aside>
