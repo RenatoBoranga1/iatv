@@ -16,3 +16,8 @@ coverage/
 *.keystore
 *.p12
 apps/backend/media/generated/
+*.apk
+*.pcap
+*.pcapng
+*.har
+runtime-private/
