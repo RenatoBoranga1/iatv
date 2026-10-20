@@ -28,6 +28,35 @@ relatado pelo operador no SM-T295. Ver [diagnóstico físico](brasil-tv-5.50-dev
 | First Frame | NÃO OBSERVADO |
 | Remaining Unknowns | Todos os contratos remotos e lifecycle do core |
 
+## Samsung SM-G610M — device compatibility gate
+
+**CONFIRMED (observação direta):** SM-G610M, Android 8.1.0/API 27,
+armeabi-v7a; APK 5.50 instalado com SHA-256
+`DD7F35A5949BECE00704BDF7D9D7A7431945F2DA5A78F873564061A38F81BA88`,
+igual ao original. Instalação concluída, startup e HomeActivity/processo ativos.
+Ao acessar Lista de Canais, a UI mostra:
+“Seu dispositivo não é compatível com este aplicativo.”
+
+Perfil phone, ausência de Leanback/television, threads ranger/handlerRanger
+observadas e recusas SELinux ao ler estatísticas do sistema são CONFIRMED.
+Nenhum erro de linker ou crash foi observado nos buffers consultados;
+isso não prova ausência em toda a execução.
+
+**HIGH_CONFIDENCE:** gate posterior ao startup; não é rejeição de instalação
+por minSdk ou ABI. **LIKELY:** restrição por tipo/modelo/form factor,
+possivelmente exigência de TV/box. Não promover essa hipótese a CONFIRMED.
+
+**UNKNOWN:** condição exata do gate, relação causal das recusas SELinux,
+DRM completo, carregamento completo das bibliotecas e aceitação de Android TV/Fire TV.
+
+Comparação: SM-T295, Android 11/API 30, arm64-v8a + armeabi-v7a, também instalou,
+iniciou, mostrou Home e a mesma mensagem segundo teste anterior do operador.
+Não houve coleta simultânea do tablet nesta máquina; propriedades adicionais
+permanecem desconhecidas. Ver [matriz](brasil-tv-compatibility-matrix.md).
+
+Esta retomada é exclusivamente documental. Testes de aplicação não reexecutados;
+provider fail-closed e mock preservados. Revisão por diff, links e escopo de arquivos.
+
 ## Gate seguinte
 
 Testar o mesmo APK em Android TV/Fire TV com suporte ARM32 verificado e repetir

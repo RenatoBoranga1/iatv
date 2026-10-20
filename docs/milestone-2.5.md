@@ -14,6 +14,18 @@ Provider fail-closed, mock e código preservados; nenhum canal implementado.
 Ver [diagnóstico e comparação](research/brasil-tv-5.50-device-gate.md).
 Entrega exclusivamente documental; builds/testes abaixo são históricos.
 
+### Status da investigação em dispositivos móveis
+
+- HANDSET_RUNTIME_CONFIRMED: runtime do 5.50 em ARM confirmado no J7.
+- HANDSET_DEVICE_GATE_CONFIRMED: gate observado diretamente no J7; o mesmo
+  gate no SM-T295 foi informado pelo operador, sem coleta simultânea.
+- ANDROID_TV_REQUIREMENT_LIKELY: hipótese de form factor TV/box, não requisito provado.
+- FIRE_TV_VALIDATION_PENDING: próximo teste discriminante em Android TV/Fire TV.
+
+Dois Samsung móveis (telefone SM-G610M e tablet SM-T295) apresentaram o gate,
+com fontes de evidência distintas. Causa exata UNKNOWN. BrasilTvProvider segue
+fail-closed, mock preservado e canais reais pendentes. Milestone 2.5 não concluído.
+
 ## Baseline histórico 2.5.2 — antes da investigação física
 
 **BLOCKED_BY_DEVICE**. Operador ainda comprará Fire TV; geração/sistema serão
