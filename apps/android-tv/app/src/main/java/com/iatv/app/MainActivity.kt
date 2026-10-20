@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -75,7 +78,12 @@ private val scrollSaver = mapSaver(
     if(playing != null) { PlaybackScreen(playing!!, model.repository, network) { playing = null; model.refreshLocal() }; return }
     Row(Modifier.fillMaxSize().background(Color(0xFF0C101B)).padding(24.dp)) {
         Column(Modifier.width(175.dp).fillMaxHeight()) {
-            Text("IA TV", fontSize = 32.sp, color = Color(0xFF65E4C5))
+            Image(
+                painter = painterResource(R.drawable.iatv_logo),
+                contentDescription = "IA TV",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxWidth().height(100.dp)
+            )
             Text("SEU UNIVERSO DE PLAY", fontSize = 9.sp, color = Color(0xFF9EABBF))
             Spacer(Modifier.height(16.dp))
             LazyColumn(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
