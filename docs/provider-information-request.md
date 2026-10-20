@@ -1,4 +1,19 @@
 # Informações necessárias do provider
+## Gate atual — 5.50: BLOCKED_BY_DEVICE
+
+O operador ainda comprará o Fire TV e confirmará geração e Fire OS com o vendedor.
+Ver [ambiente ARM](research/brasil-tv-5.50-runtime-environment.md).
+Não instalar no dispositivo físico anteriormente conectado sem seleção do operador.
+Depois de validar o aparelho, login será preenchido diretamente nele.
+Precisamos observar categorias, dois canais autorizados, channel/resource,
+resolver e fonte final. Não solicitar credenciais no chat nem reaproveitar
+supostos contratos CAuth/TVCore da versão 5.2.
+Se runtime não revelar integração suportada, solicitar SDK/documentação e
+credenciais de homologação provisionadas localmente: BLOCKED_BY_PROVIDER_INFORMATION.
+VOD, mobile e demais plataformas não fazem parte do escopo atual.
+
+## Histórico 5.2 — encerrado como referência
+
 ## BLOCKED_BY_PROVIDER_INFORMATION
 Falta conta de teste utilizável ou documentação de integração com credenciais
 provisionadas localmente. A autorização de análise foi recebida; não se pede nova

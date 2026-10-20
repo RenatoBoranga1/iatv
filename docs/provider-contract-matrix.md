@@ -1,4 +1,13 @@
 # Provider contract matrix
+## Escopo atual: 5.50 / Milestone 2.5.2
+
+5.50 é com.interactive.brasiliptv; a pesquisa de 5.2 abaixo é histórica.
+APK validado estaticamente, runtime **BLOCKED_BY_DEVICE**. Nenhum contrato
+remoto da 5.50 foi confirmado. Os estados da matriz permanecem pendentes.
+Live tem prioridade; filmes/séries ficam fora desta etapa.
+
+## Histórico 5.2
+
 Atualização 20/10: login acessível na API 29; isso não revela contratos de rede.
 Auth UI é CONFIRMED; os itens desta matriz permanecem REQUIRES_PROVIDER_CONTRACT.
 Todos os contratos abaixo precisam de evidência de runtime ou documentação oficial

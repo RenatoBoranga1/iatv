@@ -24,3 +24,18 @@ LIKELY = hipótese; UNKNOWN = sem evidência suficiente. Separar existência de 
 | API 29 executa mesmo APK e mostra login | install Success, UI com senha mascarada, launch COLD ok/Complete | CONFIRMED | runtime de pesquisa utilizável | sessão de teste | RUNTIME_UNBLOCKED |
 | Login permanece após relaunch | processo ativo + helper login_form_present=true | CONFIRMED | fluxo de UI reproduzível | auth normal | observado |
 | Catálogo / CAuth / TVCore em execução | sem sessão submetida ou probe de métodos | UNKNOWN | não implementar contrato por inferência | conta de teste e instrumentação sanitizada | BLOCKED_BY_PROVIDER_INFORMATION |
+# Escopo 5.50 — 2026-10-20
+
+| Evidência | Classificação | Limite |
+|---|---|---|
+| SHA256 DD7F35A5949BECE00704BDF7D9D7A7431945F2DA5A78F873564061A38F81BA88 | CONFIRMED | arquivo fornecido, não prova procedência |
+| com.interactive.brasiliptv / 5.50.0 / 55000; SDK 19/33/34 | CONFIRMED | aapt local |
+| lib/ contém ARM32 e ARM64, sem x86 | CONFIRMED | inventário ZIP |
+| kcptun-client e kcptun-client-live têm ELF ARM32 | CONFIRMED | cabeçalhos e_machine=40 |
+| libranger-jni e player IJK/FFmpeg presentes | CONFIRMED | presença não prova execução |
+| Shell s.h.e.l.l e assets ijiami | HIGH_CONFIDENCE | família de proteção; versão UNKNOWN |
+| JNI_OnLoad e imports de sockets no ranger ARM64 | CONFIRMED | ELF com aviso de tabela; não prova gateway |
+| Login, sessão, catálogo, dois canais, fonte, primeiro frame | UNKNOWN | runtime não executado; BLOCKED_BY_DEVICE |
+
+Detalhes: [análise estática](brasil-tv-5.50-static-analysis.md).
+A evidência de 5.2 acima não é um contrato da 5.50.
