@@ -1,4 +1,6 @@
 # Provider contract matrix
+Atualização 20/10: login acessível na API 29; isso não revela contratos de rede.
+Auth UI é CONFIRMED; os itens desta matriz permanecem REQUIRES_PROVIDER_CONTRACT.
 Todos os contratos abaixo precisam de evidência de runtime ou documentação oficial
 do provider. Símbolos não definem o protocolo de rede.
 

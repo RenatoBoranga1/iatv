@@ -1,4 +1,38 @@
 # Milestone 2.5 — Provider Integration
+## Retomada 2.5.1 — 2026-10-20
+RUNTIME_UNBLOCKED na API 29 x86: instalação limpa e login confirmados, segundo
+launch COLD ok e processo ativo. Causa provável da API 34: hook de PackageManager
+esperando Integer para flags agora Long. Sem patch no APK ou expansão de provider.
+Ver [crash](research/brasil-tv-startup-crash.md),
+[matriz](research/brasil-tv-compatibility-matrix.md) e
+[setup](research/android-legacy-runtime-setup.md).
+
+Gates: investigação de crash/contexto/persistência/manifest/ABI documentada;
+compatibilidade e startup/login API 29 aprovados. Native load pré-crash UNKNOWN.
+Métodos CAuth/config não instrumentados; catálogo e dois canais pendentes de
+sessão de teste. Portanto o critério completo de 2.5.1 (incluindo catálogo)
+ainda não foi satisfeito, embora o objetivo de desbloquear startup tenha sido.
+Milestone 2.5 e POCs reais continuam incompletos. Mobile não iniciado; sem merge.
+
+Baseline desta retomada: npm ci inicialmente falhou com EPERM ao criar symlinks
+de workspace; repetição autorizada fora do sandbox passou. Prisma generate,
+build de contracts/backend, lint backend e 14/14 testes passaram. Admin build e
+lint (TypeScript) passaram. Android assembleDebug, testDebugUnitTest e lintDebug
+passaram (62 tarefas: 1 executada, 61 up-to-date). O coletor de crash foi testado
+com dados sintéticos: mantém frames do processo alvo e remove valores arbitrários
+e frames de outro processo. A observação estrutural confirmou login vazio na API 29.
+
+Auditoria npm desta retomada: 20 vulnerabilidades reportadas (2 moderadas,
+17 altas e 1 crítica). Next 16.3.5 é dependência direta com achado crítico;
+a ferramenta aponta correção em 16.4.2. Correção e regressão de dependências
+permanecem pendentes; nenhuma atualização foi misturada à investigação de runtime.
+Builds verdes não equivalem a ausência de vulnerabilidades.
+
+O usuário optou por preencher o login diretamente no emulador visível. A observação
+da interface fica suspensa durante a digitação, até confirmação humana do resultado.
+Os resultados abaixo são históricos.
+
+## Histórico da entrega 2.5
 Estado: EM ANDAMENTO; POCs reais não executados.
 Base: milestone-2-hardening, 7039e4e; branch milestone-2.5-provider-integration.
 ## Implementado

@@ -10,8 +10,10 @@ catálogo com dois canais de teste, relação channel/resource, broker/resolver,
 um filme e um episódio autorizados. Preferível SDK/documentação oficial do core
 e condições de distribuição em Android/mobile/Tizen/webOS.
 Essas informações liberam clientes auth/live/VOD/broker e POCs reais.
-## BLOCKED_BY_RUNTIME_ENVIRONMENT
-Instalação confirmada; inicialização falha com ClassCastException Long→Integer em SopCast.onCreate na API 34 x86.
-Necessário dispositivo/imagem compatível, começando por API 29, com conta autorizada.
-Necessária evidência: instalação bem-sucedida, abertura, trace sanitizado,
-socket correlacionado e primeiro frame. Não substituir por stream de demonstração.
+## Runtime desbloqueado em 2026-10-20
+API 29 x86 executa o APK original e apresenta login, inclusive após relaunch.
+O bloqueio de startup permanece específico da API 34 testada; não impede mais
+a pesquisa usando API 29. Não é necessário alterar autenticação ou fabricar sessão.
+Próximo insumo: conta de teste provisionada localmente ou login humano no AVD
+de pesquisa. Sem isso, não enviar tentativa com credenciais inventadas nem
+declarar catálogo/TVCore alcançados. Primeiro frame pertence à etapa posterior.

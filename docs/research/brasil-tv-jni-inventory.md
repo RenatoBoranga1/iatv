@@ -1,4 +1,7 @@
 # JNI / native inventory
+Atualização 20/10: startup/login desbloqueados na API 29. Nenhuma chamada JNI
+deste inventário foi observada por probe; confiança CONFIRMED nas linhas abaixo
+continua se referindo somente à existência estática dos símbolos.
 Evidência: strings de símbolos nas bibliotecas x86 do APK com hash no relatório.
 Inputs/outputs abaixo são UNKNOWN quando a assinatura Java não foi recuperada.
 Nomes sugestivos não provam tipos, retorno ou comportamento.

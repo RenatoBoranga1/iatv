@@ -1,4 +1,45 @@
 # Brasil TV runtime analysis
+## Estado atual — 2026-10-20
+
+**RUNTIME_UNBLOCKED na API 29 x86.** APK original instalado do zero, login visível,
+processo estável entre observações e segundo launch COLD com Status ok/Complete.
+Ver [matriz](brasil-tv-compatibility-matrix.md) e [causa provável](brasil-tv-startup-crash.md).
+O Android mostrou solicitação de acesso à mídia; ela foi concedida somente no
+AVD vazio de pesquisa. A tela seguinte tem campo de usuário vazio, campo de senha
+vazio/mascarado e botão CONECTAR. Nenhuma credencial foi submetida.
+
+Auth path: UI alcançada, CONFIRMED. Chamadas CAuth, config/bootstrap, device JNI,
+broker, resource e protocolo de catálogo: UNKNOWN; não instrumentados ainda.
+Catálogo e dois canais não observados por falta de sessão de teste.
+Bibliotecas carregadas: UNKNOWN. ADB root foi recusado pela imagem de produção;
+nenhuma proteção foi alterada para obter acesso. Nomes estáticos não são prova de load.
+Socket local: NOT_OBSERVED; isso não prova ausência de gateway.
+
+Sequência sustentada por esta execução:
+```mermaid
+sequenceDiagram
+  participant Teste
+  participant Android29
+  participant Legado
+  Teste->>Android29: Instalar APK original
+  Android29-->>Teste: Success
+  Teste->>Android29: Iniciar launcher
+  Android29->>Legado: Launch
+  Legado-->>Teste: Formulário de login visível
+  Teste->>Android29: Force-stop e launch COLD
+  Android29-->>Teste: Status ok / Complete
+  Legado-->>Teste: Processo ativo e login visível
+```
+Nenhuma seta de rede/auth/broker está confirmada por esse diagrama.
+`scripts/observe-legacy-startup.ps1` emite timestamp/component/method/event/
+argument_types/result_type e somente booleanos de presença. É observação de
+UI/processo, não instrumentação de CAuth ou TVCore.
+
+Bloqueio ativo: **BLOCKED_BY_PROVIDER_INFORMATION**, conta/sessão de teste ainda
+não disponibilizada. O histórico abaixo descreve o ambiente API 34 e não substitui
+o resultado atual na API 29.
+
+## Histórico API 34
 ## Environment
 AVD dedicado provider52, Android TV API 34 x86, porta ADB 5556;
 sem conta de terceiro, separado do AVD IA TV. APK x86 disponível.
