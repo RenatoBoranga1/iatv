@@ -1,12 +1,13 @@
 # Brasil TV 5.50 — ambiente ARM
 
-Estado em 2026-10-20: **BLOCKED_BY_DEVICE**.
-O operador informou que ainda comprará o Fire TV; confirmará geração com o vendedor.
-Nenhum dispositivo físico foi autorizado para instalação nesta etapa.
-O Samsung conectado anteriormente não foi selecionado nem modificado.
-O emulador do 5.2 não será usado para executar este APK ARM.
+Estado em 2026-10-20: **BLOCKED_BY_COMPATIBILITY_GATE**.
+J7 SM-G610M observado via ADB: API 27, ARM32, phone, UI normal, sem features
+Leanback/television. APK instalado e Home confirmados; gate em Lista de Canais.
+SM-T295 API 30 ARM32/64 com mesmo gate relatado pelo operador; sem ADB nesta sessão.
+Inventário, logs, codecs, DRM e limites: [diagnóstico físico](brasil-tv-5.50-device-gate.md).
+Nenhum Android TV/Fire TV testado. A compatibilidade de TV permanece UNKNOWN.
 
-## Candidato
+## Candidato TV — histórico de planejamento
 
 Fire TV Stick 4K 2ª geração (2023), modelo AFTKM, é candidato.
 [Amazon — Fire OS](https://developer.amazon.com/docs/fire-tv/fire-os-overview.html)
@@ -18,14 +19,14 @@ Não comprar apenas com base no nome “4K Wi-Fi 6”.
 kcptun (caso sejam necessários em runtime). A compatibilidade do binário protegido
 e das dependências Google/Firebase no Fire OS ainda precisa ser testada.
 
-## Pré-instalação com participação do operador
+## Próximo dispositivo TV — pré-instalação com participação do operador
 
 Após disponibilização do aparelho, habilitar ADB conscientemente no dispositivo
 de teste e autorizar este computador. Usar sempre o serial explícito, nunca o
 primeiro aparelho da lista. Não publicar IP, serial ou identificadores da conta.
 Registrar apenas:
 
-| Item | Resultado atual |
+| Item | Resultado no candidato TV ainda não disponível |
 |---|---|
 | Fabricante/modelo real | UNKNOWN |
 | Fire OS / Android / API | UNKNOWN |

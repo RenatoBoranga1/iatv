@@ -1,5 +1,20 @@
 # Milestone 2.5 — Provider Integration
-## Etapa atual 2.5.2 — 2026-10-20
+## Atualização 2.5.2 — gate físico — 2026-10-20
+
+**BLOCKED_BY_COMPATIBILITY_GATE**. J7 API 27 ARM32 observado via ADB:
+APK instalado com hash idêntico ao original, Home ativa e mensagem de
+incompatibilidade confirmada ao acessar Lista de Canais. SM-T295 API 30
+ARM32/64 apresenta o mesmo gate segundo o operador; não conectado nesta sessão.
+
+Hipótese de elegibilidade por form factor/modelo: **LIKELY**; condição exata:
+**UNKNOWN**. Threads Ranger e recusas SELinux observadas, sem causalidade
+comprovada. Teste Android TV/Fire TV necessário para discriminar a hipótese.
+Provider fail-closed, mock e código preservados; nenhum canal implementado.
+
+Ver [diagnóstico e comparação](research/brasil-tv-5.50-device-gate.md).
+Entrega exclusivamente documental; builds/testes abaixo são históricos.
+
+## Baseline histórico 2.5.2 — antes da investigação física
 
 **BLOCKED_BY_DEVICE**. Operador ainda comprará Fire TV; geração/sistema serão
 confirmados. Pesquisa de 5.2 interrompida por solicitação, mantida como histórico.
@@ -121,4 +136,3 @@ Branch publicada em 21/09: milestone-2.5-provider-integration.
 GitHub Actions no commit 132f3fd: backend e Android SUCCESS.
 Execução: https://github.com/RenatoBoranga1/iatv/actions/runs/35594246468
 Varredura de segredos revisada: nomes de contratos, marcadores de redação e credenciais sintéticas de teste; nenhum segredo real incluído. APK, capturas e dados de runtime ficaram fora do Git.
-

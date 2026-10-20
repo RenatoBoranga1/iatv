@@ -35,7 +35,23 @@ LIKELY = hipótese; UNKNOWN = sem evidência suficiente. Separar existência de 
 | libranger-jni e player IJK/FFmpeg presentes | CONFIRMED | presença não prova execução |
 | Shell s.h.e.l.l e assets ijiami | HIGH_CONFIDENCE | família de proteção; versão UNKNOWN |
 | JNI_OnLoad e imports de sockets no ranger ARM64 | CONFIRMED | ELF com aviso de tabela; não prova gateway |
-| Login, sessão, catálogo, dois canais, fonte, primeiro frame | UNKNOWN | runtime não executado; BLOCKED_BY_DEVICE |
+| Login, sessão, catálogo, dois canais, fonte, primeiro frame | UNKNOWN | baseline anterior ao teste físico; atualização abaixo |
 
 Detalhes: [análise estática](brasil-tv-5.50-static-analysis.md).
 A evidência de 5.2 acima não é um contrato da 5.50.
+
+## Atualização 5.50 — gate físico — 2026-10-20
+
+| Evidência | Classificação | Limite |
+|---|---|---|
+| J7 API 27 ARM32, APK instalado idêntico, Home e gate na UI | CONFIRMED | observação direta ADB |
+| phone, UI normal, ausência Leanback/television | CONFIRMED | somente J7 |
+| Gate funcional após startup, não recusa de instalação | HIGH_CONFIDENCE | regra interna UNKNOWN |
+| Elegibilidade por tipo/modelo, possivelmente TV | LIKELY | falta controle TV e critério do fornecedor |
+| Threads ranger/handlerRanger no processo | CONFIRMED | mapa de libs inacessível |
+| Componente Ranger ativo | HIGH_CONFIDENCE | JNI/lifecycle completo UNKNOWN |
+| SELinux nega read de proc_stat/proc à thread ranger | CONFIRMED | causalidade com gate UNKNOWN |
+| Mesmo gate no SM-T295 API 30 ARM32/64 | LIKELY | relato do operador; sem ADB nesta sessão |
+| Condição exata, DRM, contratos remotos, playback | UNKNOWN | sem canal ou sessão inspecionada |
+
+Detalhes: [diagnóstico e próximo teste](brasil-tv-5.50-device-gate.md).
