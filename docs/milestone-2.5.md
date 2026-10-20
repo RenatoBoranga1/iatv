@@ -1,4 +1,48 @@
 # Milestone 2.5 — Provider Integration
+## Etapa atual 2.5.2 — 2026-10-20
+
+**BLOCKED_BY_DEVICE**. Operador ainda comprará Fire TV; geração/sistema serão
+confirmados. Pesquisa de 5.2 interrompida por solicitação, mantida como histórico.
+SHA inicial desta etapa: afbacb09fa72e3b6b3c0a8a74695e54847459361.
+As 11 alterações locais de 2.5.1 foram preservadas no commit ebae6a7.
+Branch milestone-2.5-provider-integration; sem merge em main.
+
+APK 5.50 validado read-only: pacote diferente, ARM32/ARM64, assets kcptun ARM32,
+ranger-jni, IJK/FFmpeg, shell/proteção e manifest inventariados.
+Não instalado. Nenhum login, catálogo, canal ou fonte observado.
+Provider permanece fail-closed e mock preservado; não há implementação real
+baseada em strings. ADR 003 não mudou: faltam evidências de runtime.
+
+Documentação:
+- [Estática e comparação](research/brasil-tv-5.50-static-analysis.md)
+- [Ambiente ARM e gate](research/brasil-tv-5.50-runtime-environment.md)
+- [Runtime e POCs pendentes](research/brasil-tv-5.50-runtime-analysis.md)
+
+Logo fornecida pelo usuário incorporada sem modificar a arte ao menu,
+ícone e banner do Android TV. Imagem local única, sem chamadas de rede;
+proporção quadrada preservada dentro do banner 16:9 e do menu.
+Sem redesign geral, alteração de navegação ou novos recursos mobile.
+
+Baseline imediatamente anterior às mudanças: backend 14/14, build/lint,
+admin build/lint, Android assembleDebug/testDebugUnitTest/lintDebug passaram.
+Após a mudança: backend build/lint passaram; primeira repetição de testes
+restrita pelo sandbox (EACCES em loopback), repetição autorizada passou 14/14.
+Validação final Android: assembleDebug, testDebugUnitTest (7 testes) e lintDebug
+passaram em 8m51s, 33 tarefas executadas e 29 up-to-date. Lint: 0 erros,
+18 warnings avaliados: atualizações de ferramentas/dependências, target API,
+orientação fixa TV, backup, KTX, STATE_IDLE e IconLauncherShape.
+O aviso do ícone decorre do fundo opaco da arte fornecida, preservado nesta
+entrega; nenhum warning foi suprimido. Recorte/adaptive icon pode ser refinado
+numa etapa de identidade visual. Warnings de clipboard/kapt também permanecem.
+Instalação e startup do IA TV no AVD API 34 passaram; Home mock e logo sem
+deformação conferidas visualmente. Isso não é teste do provider nem de TV física.
+APK debug SHA256: 4C06FB0D596249827C04FE5BD91AD956FF26A00EF5E82C2BBDDD1163E6B05891.
+Secret scan por padrões e revisão dos arquivos novos: nenhum segredo identificado;
+nenhum APK, biblioteca extraída, sessão ou dump bruto incluído no Git.
+CI do commit dbd5436: backend aprovado; Android ainda em execução na última consulta
+([Actions](https://github.com/RenatoBoranga1/iatv/actions/runs/39463609324)).
+A pendência npm audit crítica do Next registrada em 2.5.1 permanece aberta.
+
 ## Retomada 2.5.1 — 2026-10-20
 RUNTIME_UNBLOCKED na API 29 x86: instalação limpa e login confirmados, segundo
 launch COLD ok e processo ativo. Causa provável da API 34: hook de PackageManager
