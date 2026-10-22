@@ -42,16 +42,14 @@ terceiros da referência do Assistente não foram copiados.
 |---|---|---|
 | Home | IA TV_ Entretenimento sem limites.png | screenshots/01-home-implementation.png |
 | Home/foco | Imagem do ChatGPT 21 de out. de 2026, 08_30_44-5.png | screenshots/02-home-focus-implementation.png |
-| Live | Imagem do ChatGPT 21 de out. de 2026, 08_30_39-1.png | Pendente |
+| Live | Imagem do ChatGPT 21 de out. de 2026, 08_30_39-1.png | screenshots/03-live-implementation.png |
 | Details | Imagem do ChatGPT 21 de out. de 2026, 08_30_40-2.png | screenshots/04-details-implementation.png |
-| Assistente | Imagem do ChatGPT 21 de out. de 2026, 08_30_42-3.png | Pendente |
-| Busca | Imagem do ChatGPT 21 de out. de 2026, 08_30_43-4.png | Pendente |
+| Assistente | Imagem do ChatGPT 21 de out. de 2026, 08_30_42-3.png | screenshots/05-assistant-implementation.png |
+| Busca | Imagem do ChatGPT 21 de out. de 2026, 08_30_43-4.png | screenshots/06-search-implementation.png |
 
-As três capturas de implementação acima são do checkpoint de 21/10, antes dos
-refinamentos de cards, artes e espaçamento de 22/10. `before-home.png` registra
-a Home anterior. Nenhuma dessas imagens comprova a aparência final do HEAD.
-Atualizar Home, foco e Details e capturar Live, Assistente e Busca permanece
-pendente, assim como a validação visual em 720p e 4K.
+As seis capturas de implementação foram atualizadas em 22/10 com o APK local
+do código `981bf8f`, em 1920×1080/density 320. `before-home.png` registra a Home
+anterior. A validação visual em 720p e 4K permanece pendente.
 
 ## Artes e memória
 
@@ -134,6 +132,46 @@ ligadas à API existente. O menu recolhe ao sair do foco, preservando área úti
 Teste físico de legibilidade a 2–3m, controle remoto e sessões longas permanece
 REQUIRES_PHYSICAL_DEVICE. A equivalência visual integral às referências não é
 inferida apenas de build/testes: conferir a matriz e capturas desta revisão.
+
+## Refinamento visual — 22/10, segunda revisão
+
+Commit de implementação: `981bf8f`.
+
+- Cards horizontais mantêm proporção 16:9 também na grade, evitando recortes
+  excessivamente baixos quando a largura aumenta. Pôsteres aceitam duas linhas
+  de título; badges vazios não deixam um elemento sem texto sobre a imagem.
+- Assistente ganha um painel com gradiente discreto, borda e hierarquia entre
+  identificação, pergunta principal e sugestões. O orb continua estático.
+- Busca mantém a linha de ajuda ao receber/perder foco, evitando deslocamento
+  da grade. As ações Buscar/Enviar do teclado também submetem a consulta e
+  fecham o teclado.
+- Falha de atualização com conteúdo em cache usa aviso compacto com retry.
+  Sem conteúdo disponível, permanece a mensagem completa.
+
+Validação local: `assembleDebug testDebugUnitTest lintDebug` concluído com
+BUILD SUCCESSFUL em 11m28s. 21 testes, zero falhas/erros; lint com zero erros
+e 18 avisos preexistentes. CI Android e backend aprovados para o mesmo commit:
+[execução 39817023771](https://github.com/RenatoBoranga1/iatv/actions/runs/39817023771).
+
+APK instalado no emulador API 34. Conferidos: Home; Right do menu para a ação
+do hero; Down para Aurora TV; abertura por Select e Back com restauração do
+foco no mesmo card; Details com dois relacionados; Live com dois canais e
+EPG; Assistente; Busca pelo termo público `mar`, retornando O Som do Mar.
+A ação Enter do teclado submeteu a busca e fechou o teclado. A linha de ajuda
+e os filtros mantiveram suas posições ao mudar o foco.
+
+Limitação observada: algumas primeiras requisições ao mock retornaram erro de
+conexão; retry recuperou a listagem e a busca. A causa não foi determinada
+nesta revisão visual. Não foi executado playback nem teste em aparelho físico.
+
+| Tela | Inspeção da revisão | Diferença em relação à referência |
+|---|---|---|
+| Home | Hero, logo, ações e duas artes de canais visíveis | Catálogo mock menor; menu recolhe sem foco |
+| Home/foco | Borda ciano no card e retorno por Back | Menor densidade de títulos |
+| Live | Imagem 16:9, programa atual, horários e próximo | Dois canais mock, grade de três colunas |
+| Details | Sinopse, ações e relacionados visíveis | Conteúdo e arte originais de demonstração |
+| Assistente | Painel, orb, campo e sugestões legíveis | Orb abstrato; resposta abaixo da dobra exige rolagem |
+| Busca | Campo, filtros e resultado de `mar` visíveis | Um resultado real do mock, sem preencher a grade artificialmente |
 
 ## Baseline recebido do operador
 
