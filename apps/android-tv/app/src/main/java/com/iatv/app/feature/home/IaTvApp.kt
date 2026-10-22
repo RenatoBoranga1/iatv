@@ -104,7 +104,7 @@ private val scrollSaver=mapSaver(
                         IaTvActionButton("Próximo dia",{date=LocalDate.parse(date).plusDays(1).toString();load()})
                     } }
                     if(network==NetworkState.Disconnected || state.status==ScreenStatus.Offline || state.status==ScreenStatus.Error) item(key="error") {
-                        IaTvErrorState(network==NetworkState.Disconnected || state.status==ScreenStatus.Offline,::load)
+                        IaTvErrorState(network==NetworkState.Disconnected || state.status==ScreenStatus.Offline,::load,compact=sections.any { it.items.isNotEmpty() })
                     }
                     if(state.loading) item(key="loading") { IaTvLoadingCard() }
                     if(hero!=null) item(key="hero") {

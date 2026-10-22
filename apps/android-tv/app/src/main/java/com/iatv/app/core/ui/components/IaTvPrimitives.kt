@@ -84,7 +84,20 @@ import com.iatv.app.core.designsystem.*
         Text(message, color = IaTvColors.Muted, style = MaterialTheme.typography.bodyMedium)
     }
 }
-@Composable fun IaTvErrorState(offline: Boolean, onRetry: () -> Unit) {
+@Composable fun IaTvErrorState(offline: Boolean, onRetry: () -> Unit, compact: Boolean = false) {
+    if (compact) {
+        Row(Modifier.fillMaxWidth().background(IaTvColors.Surface, IaTvShapes.Card)
+            .border(1.dp, IaTvColors.Border, IaTvShapes.Card).padding(IaTvSpacing.Medium),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(IaTvSpacing.Medium)) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(if(offline) "Sem conexão" else "Não foi possível atualizar", style = MaterialTheme.typography.titleMedium, color = IaTvColors.Warning)
+                Text("Exibindo o conteúdo carregado anteriormente.", style = MaterialTheme.typography.bodyMedium, color = IaTvColors.Muted)
+            }
+            IaTvActionButton("Tentar novamente", onRetry)
+        }
+        return
+    }
     Column(Modifier.fillMaxWidth().background(IaTvColors.Surface, IaTvShapes.Card).padding(IaTvSpacing.Large),
         verticalArrangement = Arrangement.spacedBy(IaTvSpacing.Medium)) {
         Text(if(offline) "Sem conexão" else "Vamos tentar de novo?", style = MaterialTheme.typography.titleLarge, color = IaTvColors.Warning)

@@ -2,6 +2,8 @@ package com.iatv.app.feature.assistant
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -17,9 +19,12 @@ import com.iatv.app.feature.search.SearchHeader
 
 @Composable fun AssistantHeader(query: String, onQuery: (String) -> Unit, onSubmit: () -> Unit, onSuggestion: (String) -> Unit) {
     Column(verticalArrangement=Arrangement.spacedBy(16.dp)) {
-        IaTvBadge("✦ SEU ASSISTENTE IA TV",ai=true)
-        Row(verticalAlignment=Alignment.CenterVertically) {
+        Row(Modifier.fillMaxWidth()
+            .background(Brush.horizontalGradient(listOf(IaTvColors.Surface,IaTvColors.Raised,IaTvColors.Surface)),IaTvShapes.Card)
+            .border(1.dp,IaTvColors.Border,IaTvShapes.Card).padding(24.dp),
+            verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(24.dp)) {
             Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+                IaTvBadge("✦ SEU ASSISTENTE IA TV",ai=true)
                 Text("O que você quer\nassistir hoje?",style=MaterialTheme.typography.headlineLarge)
                 Text("Conte o que está com vontade de ver. Encontre a próxima história no catálogo IA TV.",color=IaTvColors.Muted)
             }
@@ -30,6 +35,7 @@ import com.iatv.app.feature.search.SearchHeader
             }
         }
         SearchHeader(query,onQuery,onSubmit,assistant=true)
+        Text("Experimente uma ideia",style=MaterialTheme.typography.titleMedium,color=IaTvColors.Muted)
         LazyRow(horizontalArrangement=Arrangement.spacedBy(10.dp),contentPadding=PaddingValues(4.dp)) {
             items(listOf("Comédia","Futebol hoje","Para a família","Suspense","Lançamentos","Algo leve")) { suggestion ->
                 IaTvActionButton(suggestion,{onSuggestion(suggestion)})

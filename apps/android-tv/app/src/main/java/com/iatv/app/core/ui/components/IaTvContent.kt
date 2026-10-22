@@ -60,13 +60,13 @@ import kotlinx.coroutines.CancellationException
         .background(IaTvColors.Surface,IaTvShapes.Card).clip(IaTvShapes.Card)
         .clickable(role=Role.Button,onClick=onClick)
         .semantics(mergeDescendants=true) { contentDescription="${item.title}, ${item.category}" }) {
-        Box(Modifier.fillMaxWidth().height(if(poster) 190.dp else 112.dp)) {
+        Box(Modifier.fillMaxWidth().then(if(poster) Modifier.height(190.dp) else Modifier.aspectRatio(16f / 9f))) {
             IaTvBackdrop(Modifier.fillMaxSize(),id=item.id,thumbnail=true)
             Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(IaTvColors.Transparent,IaTvColors.Background.copy(alpha=.25f),IaTvColors.Background.copy(alpha=.98f)))))
-            Text(if(item.kind=="channel") "AO VIVO • DEMO" else item.badge,
+            if(item.kind=="channel" || item.badge.isNotBlank()) Text(if(item.kind=="channel") "AO VIVO • DEMO" else item.badge,
                 Modifier.align(Alignment.TopStart).padding(10.dp).background(if(item.kind=="channel") IaTvColors.Live else IaTvColors.Surface, IaTvShapes.Pill).padding(horizontal=6.dp,vertical=2.dp),style=MaterialTheme.typography.labelMedium,color=IaTvColors.Text,maxLines=1)
             Column(Modifier.align(Alignment.BottomStart).padding(10.dp),verticalArrangement=Arrangement.spacedBy(2.dp)) {
-                Text(item.title,style=MaterialTheme.typography.titleMedium,maxLines=1,overflow=TextOverflow.Ellipsis)
+                Text(item.title,style=MaterialTheme.typography.titleMedium,maxLines=if(poster) 2 else 1,overflow=TextOverflow.Ellipsis)
                 Text(item.category,style=MaterialTheme.typography.labelMedium,color=IaTvColors.Muted,maxLines=1,overflow=TextOverflow.Ellipsis)
             }
         }
