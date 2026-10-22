@@ -1,5 +1,6 @@
 package com.iatv.app.core.model
-data class ContentCard(val id: String, val kind: String, val title: String, val overview: String, val category: String, val durationMinutes: Int, val badge: String, val playable: Boolean)
+data class ContentCard(val id: String, val kind: String, val title: String, val overview: String, val category: String, val durationMinutes: Int, val badge: String, val playable: Boolean,
+    val posterUrl: String? = null, val backdropUrl: String? = null, val logoUrl: String? = null, val thumbnailUrl: String? = null)
 data class HomeSection(val id: String, val title: String, val items: List<ContentCard>)
 data class HomeResponse(val greeting: String, val sections: List<HomeSection>, val mock: Boolean)
 data class AssistantResponse(val message: String, val intent: String, val cards: List<ContentCard>, val mock: Boolean)

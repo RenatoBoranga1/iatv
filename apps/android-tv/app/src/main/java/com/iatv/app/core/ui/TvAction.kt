@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import com.iatv.app.core.designsystem.IaTvColors
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 
@@ -18,12 +18,12 @@ import androidx.tv.material3.ButtonDefaults
 ) {
     Button(onClick = onClick, modifier = modifier, enabled = enabled && !loading,
         colors = ButtonDefaults.colors(
-            containerColor = Color(0xFF1D2738),
-            contentColor = Color(0xFFEAF2FA),
-            focusedContainerColor = Color(0xFF65E4C5),
-            focusedContentColor = Color(0xFF0C101B),
-            disabledContainerColor = Color(0xFF182030),
-            disabledContentColor = Color(0xFF77849A)
+            containerColor = IaTvColors.Surface,
+            contentColor = IaTvColors.Text,
+            focusedContainerColor = IaTvColors.Cyan,
+            focusedContentColor = IaTvColors.Background,
+            disabledContainerColor = IaTvColors.Surface,
+            disabledContentColor = IaTvColors.Muted
         )) {
         CompositionLocalProvider(androidx.compose.material3.LocalContentColor provides androidx.tv.material3.LocalContentColor.current) {
             if(loading) androidx.compose.material3.Text("Carregando…") else content()
