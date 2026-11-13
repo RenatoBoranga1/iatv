@@ -1,10 +1,21 @@
 # Brasil TV 5.50 — ambiente ARM
 
-Estado em 2026-10-20: **BLOCKED_BY_DEVICE**.
-O operador informou que ainda comprará o Fire TV; confirmará geração com o vendedor.
-Nenhum dispositivo físico foi autorizado para instalação nesta etapa.
+Retomada em 2026-10-20: operador informou Fire TV disponível e autorizou
+identificação e instalação, primeiro IA TV e depois Brasil TV 5.50.
+HEAD inicial confirmado: 785725c084708da5d8da44f65b79d8db358c5685,
+branch milestone-2.5-provider-integration, working tree inicialmente limpo.
+**BLOCKED_BY_DEVICE** neste momento significa conexão ADB pendente:
+`adb devices -l` só encontrou o Samsung, nenhum Fire TV. Foi solicitado ao
+operador habilitar ADB e informar endereço local de conexão; nenhum IP será
+versionado. A consulta precisou executar fora do sandbox para acessar o servidor ADB.
 O Samsung conectado anteriormente não foi selecionado nem modificado.
 O emulador do 5.2 não será usado para executar este APK ARM.
+
+Os dois APKs locais foram encontrados e seus SHA-256 revalidados:
+- IA TV: 4C06FB0D596249827C04FE5BD91AD956FF26A00EF5E82C2BBDDD1163E6B05891.
+- Brasil TV: DD7F35A5949BECE00704BDF7D9D7A7431945F2DA5A78F873564061A38F81BA88.
+
+Nenhuma instalação ou captura de tela foi executada nesta retomada.
 
 ## Candidato
 
