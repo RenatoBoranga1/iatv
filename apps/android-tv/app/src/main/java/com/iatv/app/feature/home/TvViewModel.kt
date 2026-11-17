@@ -56,8 +56,8 @@ data class TvState(val status: ScreenStatus = ScreenStatus.Loading, val sections
         val retained = if (sameRequest) mutable.value.sections else emptyList()
         currentPage = page; currentQuery = query; currentDate = date
         request?.cancel()
+        mutable.value = TvState(sections = retained)
         request = viewModelScope.launch {
-            mutable.value = TvState(sections = retained)
             try {
                 val sections = when(page) {
                     "Início" -> {

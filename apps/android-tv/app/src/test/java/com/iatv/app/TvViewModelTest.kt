@@ -89,6 +89,9 @@ class TvViewModelTest {
             model.load("Busca", "mar"); runCurrent()
             fake.wait = 1000
             fake.failure = java.io.IOException()
+            model.load("Busca", "outro")
+            // A second refresh before the dispatcher runs must not retain
+            // the old query's cards under the new query's identity.
             model.load("Busca", "outro"); runCurrent()
             assertTrue(model.state.value.sections.isEmpty())
             advanceTimeBy(1000); runCurrent()
