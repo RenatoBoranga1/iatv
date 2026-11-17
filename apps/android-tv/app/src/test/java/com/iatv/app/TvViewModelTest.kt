@@ -55,8 +55,72 @@ class TvViewModelTest {
             assertEquals(ScreenStatus.Content, model.state.value.status)
         } finally { store.clear(); runCurrent(); Dispatchers.resetMain() }
     }
+    @Test fun refreshKeepsCardsWhileLoadingAndAfterFailure() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val fake = FakeStore()
+            val model = TvViewModel(fake, MutableStateFlow(NetworkState.Connected), silent)
+            store.put("vm", model)
+            model.load("Busca", "mar"); runCurrent()
+            val results = model.state.value.sections
+            assertTrue(results.single().items.isNotEmpty())
+            fake.wait = 1000
+            fake.failure = java.io.IOException()
+            model.load("Busca", "mar"); runCurrent()
+            assertEquals(ScreenStatus.Loading, model.state.value.status)
+            assertEquals(results, model.state.value.sections)
+            advanceTimeBy(1000); runCurrent()
+            assertEquals(ScreenStatus.Offline, model.state.value.status)
+            assertEquals(results, model.state.value.sections)
+            fake.wait = 0
+            fake.failure = null
+            model.load("Busca", "mar"); runCurrent()
+            assertEquals(ScreenStatus.Content, model.state.value.status)
+        } finally { store.clear(); runCurrent(); Dispatchers.resetMain() }
+    }
+    @Test fun newQueryDoesNotReusePreviousResultsOnFailure() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val fake = FakeStore()
+            val model = TvViewModel(fake, MutableStateFlow(NetworkState.Connected), silent)
+            store.put("vm", model)
+            model.load("Busca", "mar"); runCurrent()
+            fake.wait = 1000
+            fake.failure = java.io.IOException()
+            model.load("Busca", "outro"); runCurrent()
+            assertTrue(model.state.value.sections.isEmpty())
+            advanceTimeBy(1000); runCurrent()
+            assertEquals(ScreenStatus.Offline, model.state.value.status)
+            assertTrue(model.state.value.sections.isEmpty())
+        } finally { store.clear(); runCurrent(); Dispatchers.resetMain() }
+    }
+    @Test fun changingPageDoesNotDisplayPreviousSearchResults() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val fake = FakeStore()
+            val model = TvViewModel(fake, MutableStateFlow(NetworkState.Connected), silent)
+            store.put("vm", model)
+            model.load("Busca", "mar"); runCurrent()
+            fake.failure = java.io.IOException()
+            model.load("TV ao Vivo"); runCurrent()
+            assertEquals(ScreenStatus.Offline, model.state.value.status)
+            assertTrue(model.state.value.sections.isEmpty())
+        } finally { store.clear(); runCurrent(); Dispatchers.resetMain() }
+    }
     private class FakeStore : TvStore {
-        override val api: TvApi get() = error("Unexpected API operation")
+        override val api = object : TvApi {
+            override suspend fun search(query: String): List<ContentCard> { delay(wait); failure?.let { throw it }; return listOf(card) }
+            override suspend fun catalog(): List<ContentCard> { failure?.let { throw it }; return listOf(card) }
+            override suspend fun home() = error("Unexpected API operation")
+            override suspend fun health() = error("Unexpected API operation")
+            override suspend fun sports(date: String) = error("Unexpected API operation")
+            override suspend fun epg(id: String) = error("Unexpected API operation")
+            override suspend fun chat(request: ChatRequest) = error("Unexpected API operation")
+            override suspend fun playback(id: String) = error("Unexpected API operation")
+        }
         var calls = 0
         var failure: Exception? = null
         var wait = 0L

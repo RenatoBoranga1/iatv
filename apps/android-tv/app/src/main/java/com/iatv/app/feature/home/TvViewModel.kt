@@ -50,10 +50,14 @@ data class TvState(val status: ScreenStatus = ScreenStatus.Loading, val sections
     }
     fun refreshLocal() { mutable.value = mutable.value.copy(sections = repository.personalize(mutable.value.sections)) }
     fun load(page: String, query: String = "", date: String = java.time.LocalDate.now(java.time.ZoneId.of("America/Sao_Paulo")).toString()) {
+        // Keep only the current request's results; never show a previous search
+        // or another page's catalog under a new heading.
+        val sameRequest = page == currentPage && query == currentQuery && date == currentDate
+        val retained = if (sameRequest) mutable.value.sections else emptyList()
         currentPage = page; currentQuery = query; currentDate = date
         request?.cancel()
         request = viewModelScope.launch {
-            mutable.value = TvState()
+            mutable.value = TvState(sections = retained)
             try {
                 val sections = when(page) {
                     "Início" -> {
@@ -73,7 +77,7 @@ data class TvState(val status: ScreenStatus = ScreenStatus.Loading, val sections
                 telemetry.error("screen_error", error.javaClass.simpleName)
                 val offline = error is java.io.IOException && error !is com.google.gson.stream.MalformedJsonException
                 val cache = repository.cachedHome()?.sections.orEmpty()
-                val available = when(page) {
+                val available = if (retained.any { it.items.isNotEmpty() }) repository.personalize(retained) else when(page) {
                     "Início" -> repository.personalize(cache)
                     "Minha Lista" -> repository.personalize(cache).filter { it.id == "favorites" }
                     else -> emptyList()

@@ -106,7 +106,7 @@ private val scrollSaver=mapSaver(
                     if(network==NetworkState.Disconnected || state.status==ScreenStatus.Offline || state.status==ScreenStatus.Error) item(key="error") {
                         IaTvErrorState(network==NetworkState.Disconnected || state.status==ScreenStatus.Offline,::load,compact=sections.any { it.items.isNotEmpty() })
                     }
-                    if(state.loading) item(key="loading") { IaTvLoadingCard() }
+                    if(state.loading && sections.all { it.items.isEmpty() }) item(key="loading") { IaTvLoadingCard() }
                     if(hero!=null) item(key="hero") {
                         val favorite=remember(hero.id,favoritesVersion) { hero.id in model.repository.favorites() }
                         IaTvHero(hero,favorite,{lastCard="hero";playing=hero},{model.repository.toggleFavorite(hero.id);favoritesVersion++;model.refreshLocal()},{lastCard="hero";detail=hero},playModifier=Modifier.focusRequester(heroFocus))
